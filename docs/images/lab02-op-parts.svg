@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="500" viewBox="0 0 1440 500" role="img" aria-labelledby="title desc">
+<title id="title">Operation 的定义由哪些部分组成</title><desc id="desc">ODS 把约束、文本语法和 C++ API 联系起来。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526580"/></marker></defs>
+<rect width="1440" height="100%" rx="20" fill="#f5f8fd"/>
+<text x="42" y="53" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="31" font-weight="700" text-anchor="start" fill="#172b4d">Operation 的定义由哪些部分组成</text>
+<text x="42" y="91" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#526580">ODS 把约束、文本语法和 C++ API 联系起来。</text>
+<rect x="45" y="125" width="660" height="150" rx="15" fill="#fff" stroke="#d7e1f1" stroke-width="2"/>
+<rect x="45" y="125" width="660" height="9" rx="4" fill="#2563eb" stroke="#2563eb" stroke-width="2"/>
+<text x="375.0" y="172" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" text-anchor="middle" fill="#2563eb">arguments / results</text>
+<text x="375.0" y="211" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#172b4d">声明输入、属性与结果</text>
+<text x="375.0" y="242" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#172b4d">$lhs / $rhs / $result 决定访问器名称</text>
+<rect x="735" y="125" width="660" height="150" rx="15" fill="#fff" stroke="#d7e1f1" stroke-width="2"/>
+<rect x="735" y="125" width="660" height="9" rx="4" fill="#059669" stroke="#059669" stroke-width="2"/>
+<text x="1065.0" y="172" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" text-anchor="middle" fill="#059669">Traits</text>
+<text x="1065.0" y="211" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#172b4d">例如 SameOperandsAndResultType</text>
+<text x="1065.0" y="242" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#172b4d">声明结构、类型或副作用相关性质</text>
+<rect x="45" y="295" width="660" height="150" rx="15" fill="#fff" stroke="#d7e1f1" stroke-width="2"/>
+<rect x="45" y="295" width="660" height="9" rx="4" fill="#7c3aed" stroke="#7c3aed" stroke-width="2"/>
+<text x="375.0" y="342" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" text-anchor="middle" fill="#7c3aed">assemblyFormat</text>
+<text x="375.0" y="381" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#172b4d">声明文本如何解析与打印</text>
+<text x="375.0" y="412" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#172b4d">例如输入、逗号、冒号和结果类型</text>
+<rect x="735" y="295" width="660" height="150" rx="15" fill="#fff" stroke="#d7e1f1" stroke-width="2"/>
+<rect x="735" y="295" width="660" height="9" rx="4" fill="#d97706" stroke="#d97706" stroke-width="2"/>
+<text x="1065.0" y="342" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" text-anchor="middle" fill="#d97706">hasVerifier</text>
+<text x="1065.0" y="381" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#172b4d">生成 verify() 的声明</text>
+<text x="1065.0" y="412" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#172b4d">额外语义由手写 C++ 实现</text>
+<text x="42" y="478" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#526580">MLIR 学习实验 · 图解教程</text>
+</svg>

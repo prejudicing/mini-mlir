@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="440" viewBox="0 0 1440 440" role="img" aria-labelledby="title desc">
+<title id="title">两种正确性检查</title><desc id="desc">整数实现正确，与相对原始浮点计算存在误差，可以同时成立。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526580"/></marker></defs>
+<rect width="1440" height="100%" rx="20" fill="#f5f8fd"/>
+<text x="42" y="53" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="31" font-weight="700" text-anchor="start" fill="#172b4d">两种正确性检查</text>
+<text x="42" y="91" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#526580">整数实现正确，与相对原始浮点计算存在误差，可以同时成立。</text>
+<rect x="45" y="130" width="600" height="235" rx="15" fill="#fff" stroke="#d7e1f1" stroke-width="2"/>
+<text x="73" y="172" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" text-anchor="start" fill="#2563eb">整数参考检查</text>
+<text x="73" y="219" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172b4d">输入同一份 qA / qB / qC</text>
+<text x="73" y="258" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172b4d">模拟 ISA 对比整数点积</text>
+<text x="73" y="297" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172b4d">应当逐元素完全一致</text>
+<rect x="790" y="130" width="600" height="235" rx="15" fill="#fff" stroke="#d7e1f1" stroke-width="2"/>
+<text x="818" y="172" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" text-anchor="start" fill="#059669">浮点误差检查</text>
+<text x="818" y="219" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172b4d">qC_out × sA × sB</text>
+<text x="818" y="258" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172b4d">对比原始 FP32 计算</text>
+<text x="818" y="297" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172b4d">误差来自量化和舍入</text>
+<path d="M670,220.0 L765,220.0" fill="none" stroke="#526580" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="720" y="385" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#526580">同时报告整数精确一致和反量化误差，才能判断整条路径。</text>
+<text x="42" y="418" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#526580">MLIR 学习实验 · 图解教程</text>
+</svg>

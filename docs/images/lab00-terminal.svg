@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="400" viewBox="0 0 1440 400" role="img" aria-labelledby="title desc">
+<title id="title">第一次打开项目</title><desc id="desc">所有路径都以终端当前目录为起点。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526580"/></marker></defs>
+<rect width="1440" height="100%" rx="20" fill="#f5f8fd"/>
+<text x="42" y="53" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="31" font-weight="700" text-anchor="start" fill="#172b4d">第一次打开项目</text>
+<text x="42" y="91" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#526580">所有路径都以终端当前目录为起点。</text>
+<rect x="55.0" y="145" width="298.0" height="150" rx="15" fill="#fff" stroke="#d7e1f1" stroke-width="2"/>
+<rect x="55.0" y="145" width="298.0" height="9" rx="4" fill="#2563eb" stroke="#2563eb" stroke-width="2"/>
+<text x="204.0" y="192" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" text-anchor="middle" fill="#2563eb">pwd</text>
+<text x="204.0" y="231" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#172b4d">查看当前目录</text>
+<rect x="399.0" y="145" width="298.0" height="150" rx="15" fill="#fff" stroke="#d7e1f1" stroke-width="2"/>
+<rect x="399.0" y="145" width="298.0" height="9" rx="4" fill="#059669" stroke="#059669" stroke-width="2"/>
+<text x="548.0" y="192" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" text-anchor="middle" fill="#059669">cd 项目路径</text>
+<text x="548.0" y="231" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#172b4d">进入项目根目录</text>
+<path d="M360.0,220 L391.0,220" fill="none" stroke="#526580" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="743.0" y="145" width="298.0" height="150" rx="15" fill="#fff" stroke="#d7e1f1" stroke-width="2"/>
+<rect x="743.0" y="145" width="298.0" height="9" rx="4" fill="#7c3aed" stroke="#7c3aed" stroke-width="2"/>
+<text x="892.0" y="192" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" text-anchor="middle" fill="#7c3aed">ls</text>
+<text x="892.0" y="231" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#172b4d">查看有哪些文件</text>
+<path d="M704.0,220 L735.0,220" fill="none" stroke="#526580" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="1087.0" y="145" width="298.0" height="150" rx="15" fill="#fff" stroke="#d7e1f1" stroke-width="2"/>
+<rect x="1087.0" y="145" width="298.0" height="9" rx="4" fill="#d97706" stroke="#d97706" stroke-width="2"/>
+<text x="1236.0" y="192" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" text-anchor="middle" fill="#d97706">bash 脚本</text>
+<text x="1236.0" y="231" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#172b4d">开始构建和检查</text>
+<path d="M1048.0,220 L1079.0,220" fill="none" stroke="#526580" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="720" y="343" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="400" text-anchor="middle" fill="#526580">$ 是常见提示符，不属于需要输入的命令。</text>
+<text x="42" y="378" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#526580">MLIR 学习实验 · 图解教程</text>
+</svg>

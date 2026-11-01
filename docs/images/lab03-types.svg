@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="440" viewBox="0 0 1440 440" role="img" aria-labelledby="title desc">
+<title id="title">这次 TypeConverter 为什么不改变类型</title><desc id="desc">源 Toy 方言已经使用目标 Arith 能接受的内置整数类型。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526580"/></marker></defs>
+<rect width="1440" height="100%" rx="20" fill="#f5f8fd"/>
+<text x="42" y="53" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="31" font-weight="700" text-anchor="start" fill="#172b4d">这次 TypeConverter 为什么不改变类型</text>
+<text x="42" y="91" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#526580">源 Toy 方言已经使用目标 Arith 能接受的内置整数类型。</text>
+<rect x="45" y="130" width="600" height="235" rx="15" fill="#fff" stroke="#d7e1f1" stroke-width="2"/>
+<text x="73" y="172" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" text-anchor="start" fill="#2563eb">当前：恒等映射</text>
+<text x="73" y="219" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172b4d">i32 → i32</text>
+<text x="73" y="258" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172b4d">i64 → i64</text>
+<text x="73" y="297" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172b4d">函数签名无需改变</text>
+<rect x="790" y="130" width="600" height="235" rx="15" fill="#fff" stroke="#d7e1f1" stroke-width="2"/>
+<text x="818" y="172" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" text-anchor="start" fill="#059669">未来：改变类型</text>
+<text x="818" y="219" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172b4d">例如 !toy.int → i32</text>
+<text x="818" y="258" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172b4d">需要处理块参数和函数签名</text>
+<text x="818" y="297" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="400" text-anchor="start" fill="#172b4d">还可能需要 materialization</text>
+<path d="M670,220.0 L765,220.0" fill="none" stroke="#526580" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="720" y="385" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" text-anchor="middle" fill="#526580">TypeConverter 描述类型映射，不会自动完成所有算子转换。</text>
+<text x="42" y="418" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#526580">MLIR 学习实验 · 图解教程</text>
+</svg>

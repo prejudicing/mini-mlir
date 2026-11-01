@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.20)
+project(Lab03 LANGUAGES CXX)
+include(../cmake/MLIRLab.cmake)
+if(NOT TARGET ToyDialect)
+  add_subdirectory(../lab02-toy-dialect toy-dialect EXCLUDE_FROM_ALL)
+endif()
+
+add_library(ToyConversion lib/ConvertToyToArith.cpp)
+target_include_directories(ToyConversion PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(ToyConversion PUBLIC ToyDialect MLIRArithDialect
+  MLIRFuncDialect MLIRTransforms MLIRPass)
+add_executable(toy-convert-opt tools/toy-convert-opt.cpp)
+target_link_libraries(toy-convert-opt PRIVATE ToyConversion MLIROptLib)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  add_lab_lit_test(toy-convert-opt)
+endif()

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="390" viewBox="0 0 1440 390" role="img" aria-labelledby="title desc">
+<title id="title">一个 FP32 tile 的 SRAM 生命周期</title><desc id="desc">4×4×4 tile：三个区域分别保存 A、B、C 小块。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526580"/></marker></defs>
+<rect width="1440" height="100%" rx="20" fill="#f5f8fd"/>
+<text x="42" y="53" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="31" font-weight="700" text-anchor="start" fill="#172b4d">一个 FP32 tile 的 SRAM 生命周期</text>
+<text x="42" y="91" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#526580">4×4×4 tile：三个区域分别保存 A、B、C 小块。</text>
+<rect x="90.0" y="165" width="393.3333333333333" height="120" rx="15" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+<text x="110.0" y="200" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="28" font-weight="700" text-anchor="start" fill="#2563eb">A tile</text>
+<text x="110.0" y="236" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="22" font-weight="400" text-anchor="start" fill="#172b4d">起点 0 · 有效 64 字节</text>
+<text x="110.0" y="270" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#526580">tm × tk × 4</text>
+<rect x="503.3333333333333" y="165" width="393.3333333333333" height="120" rx="15" fill="#fff" stroke="#059669" stroke-width="2"/>
+<text x="523.3333333333333" y="200" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="28" font-weight="700" text-anchor="start" fill="#059669">B tile</text>
+<text x="523.3333333333333" y="236" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="22" font-weight="400" text-anchor="start" fill="#172b4d">起点 64 · 有效 64 字节</text>
+<text x="523.3333333333333" y="270" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#526580">tk × tn × 4</text>
+<path d="M483.3333333333333,145 L483.3333333333333,159" fill="none" stroke="#526580" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="916.6666666666666" y="165" width="393.3333333333333" height="120" rx="15" fill="#fff" stroke="#7c3aed" stroke-width="2"/>
+<text x="936.6666666666666" y="200" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="28" font-weight="700" text-anchor="start" fill="#7c3aed">C tile</text>
+<text x="936.6666666666666" y="236" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="22" font-weight="400" text-anchor="start" fill="#172b4d">起点 128 · 有效 64 字节</text>
+<text x="936.6666666666666" y="270" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#526580">tm × tn × 4</text>
+<path d="M896.6666666666666,145 L896.6666666666666,159" fill="none" stroke="#526580" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="720" y="333" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="22" font-weight="400" text-anchor="middle" fill="#526580">当前 tile 完成写回后，这 192 字节可供下一个 tile 重用。</text>
+<text x="42" y="368" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#526580">MLIR 学习实验 · 图解教程</text>
+</svg>
