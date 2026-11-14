@@ -1,0 +1,4 @@
+# Tested CPU-only environment; LLVM/MLIR remains the system version 20.
+--index-url https://download.pytorch.org/whl/cpu
+torch==2.5.1
+numpy==2.2.6

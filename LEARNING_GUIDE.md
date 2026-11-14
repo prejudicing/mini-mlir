@@ -6,7 +6,7 @@
 
 ![项目的两条学习路线：Toy 到 LLVM，以及 Linalg 到 NPU 伪指令](docs/images/learning-map.png)
 
-图 1：Lab2～Lab4 构成标量编译路线；Lab5 是独立的 NPU 编译路线。它们复用知识，但并非把 Toy、LLVM、Linalg、NPU 依次串起来。
+图 1：Lab2～Lab4 构成标量编译路线；Lab5 是独立的 NPU 编译路线，Lab6 将其入口向前扩展到 PyTorch。它们复用知识，但并非把 Toy、LLVM、Linalg、NPU 依次串起来。
 
 ## 先准备好学习方式
 
@@ -29,8 +29,11 @@
 | 3 | [Toy → Arith 的完整转换](lab03-dialect-conversion/TUTORIAL.md) | 区分局部优化与转换合法性 |
 | 4 | [组装编译流水线并执行 LLVM IR](lab04-compiler-pipeline/TUTORIAL.md) | 观察多个 Pass 的效果，验证程序结果 |
 | 5 | [Mini NPU：从矩阵到伪指令，再到 INT8](lab05-mini-npu-compiler/TUTORIAL.md) | 手算分块、地址、量化，并核对数值 |
+| 6 | [PyTorch 小模型：接入 NPU 编译器](lab06-pytorch-to-npu/TUTORIAL.md) | 捕获并检查模型图，适配调用约定，对照 PyTorch 数值 |
 
 Lab5 的 INT8 细节还可以继续阅读 [量化专题](lab05-mini-npu-compiler/INT8_QUANTIZATION.md)。
+
+Lab6 提供 5 张新图解，使用手写的窄范围 `torch.export → Linalg` 前端，复用 Lab5 的 C++ 后端与模拟器。先安装 Lab6 的独立 Python 依赖，再运行其构建与测试；详见 [运行参考](lab06-pytorch-to-npu/README.md)。
 
 ## 先记住这些词的直观含义
 

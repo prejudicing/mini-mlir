@@ -4,7 +4,11 @@
 
 这是可以完整运行的教学编译器：输入 Linalg buffer matmul，输出自定义 NPU 伪指令，并用指令模拟器核对数值。代码、样例、错误案例与自动测试均已实现。
 
+观察完整过程：[逐阶段 IR 与最终伪指令](IR_STAGES.md)。运行 `python3 lab05-mini-npu-compiler/scripts/dump_ir_stages.py --mode both`（在项目根目录）可以导出 FP32/INT8 两条路径的全部表示及可直接阅读的对照文档。
+
 已加入 INT8 量化路径：支持对称逐张量校准、INT8 输入、INT32 累加、混合位宽内存规划和反量化误差验证。先阅读下面的 FP32 基础流程，再进入 [INT8 量化教程](INT8_QUANTIZATION.md)。快速体验：`python3 int8_demo.py`。
+
+下一课：[Lab6：接入 PyTorch 的 A @ B 模型](../lab06-pytorch-to-npu/TUTORIAL.md)。Lab6 复用本实验的后端和模拟器，增加真实模型导出、静态单算子前端、输出 buffer 调用约定和 PyTorch 数值对照。为逐阶段保存 IR，本实验的单独 Pass 也支持 `--npu-tile='tile-size=2'`、`--npu-plan-memory='sram-bytes=512'`。
 
 ## 1. 先运行完整流程
 

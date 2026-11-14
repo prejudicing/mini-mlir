@@ -109,6 +109,10 @@ Lab3 的 CMake 复用 Lab2 的 ToyDialect 源码；你不需要先手动构建 L
 
 ## 修改练习
 
+测试运行关系见 [CTest 调用图](diagrams/README.md)：从 CTest 启动 lit，到读取 RUN、执行转换 Pass，再到 FileCheck 或预期诊断检查。
+
+如果不清楚 CMake、lit 和 CHECK 注释如何联系，先看 [测试工具关系图](diagrams/test-tools-relationship.png)，重点区分测试文件中的 RUN、CHECK、IR 正文，以及 FileCheck 的两份输入。
+
 先复制 tests/convert.mlir 到 build/change.mlir，把常量 10 改成 12。预测转换后仍是常量 12 加上 0，没有自动变成更短的表达。
 
 代码练习：临时把 `patterns.add<ConvertConstant, ConvertAdd>` 改成只加入 ConvertConstant。重新构建并运行，预期 toy.add 无法合法化。然后恢复规则，再跑：

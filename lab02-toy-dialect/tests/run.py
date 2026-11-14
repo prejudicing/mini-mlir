@@ -25,7 +25,7 @@ for source in [root / "test.mlir", root / "tests/valid.mlir"]:
 
 run([tool, str(root / "tests/invalid.mlir"),
      "--split-input-file", "--verify-diagnostics"])
-print("PASS: invalid.mlir (five expected verifier diagnostics)")
+print("PASS: invalid.mlir (expected verifier diagnostics)")
 
 # verify-diagnostics 在诊断符合预期时返回成功；另外确认普通模式真的拒绝非法 IR。
 bad = "module { func.func @bad() -> i8 { %c = toy.constant 1 : i8 return %c : i8 } }"

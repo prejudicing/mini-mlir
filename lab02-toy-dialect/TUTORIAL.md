@@ -121,6 +121,8 @@ toy.constant 的 value 是属性，表示编译期直接记录在 IR 上的常�
 
 ## 修改练习与常见问题
 
+本次动手任务：[自己定义并注册 toy.mul](TODO.md)。源码和测试中已标出 `TODO(LAB2-MUL-1)` 到 `TODO(LAB2-MUL-5)` 的填写区域；先完成乘法练习，暂时保持 i32/i64 范围。下面的 i16 扩展作为之后的可选练习。
+
 先复制 test.mlir 到 build/change.mlir，将常量改成 11，运行 toy-opt；输出应保留 toy.add，且常量数值变化。再试负数常量，理解 signless i32 并不禁止负数。
 
 代码练习：让 Verifier 支持 i16，并补一个正例。原先要求 i16 报错的测试也要调整。完成后重新构建，运行 `ctest --test-dir build --output-on-failure`。

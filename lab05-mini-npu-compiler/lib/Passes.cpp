@@ -134,8 +134,9 @@ struct QuantizePass : PassWrapper<QuantizePass, OperationPass<ModuleOp>> {
 struct TilePass : PassWrapper<TilePass, OperationPass<ModuleOp>> {
   MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(TilePass)
   TilePass() = default;
-  explicit TilePass(int64_t size) : tileSize(size) {}
-  int64_t tileSize = 4;
+  TilePass(const TilePass &other) : PassWrapper(other) {}
+  explicit TilePass(int64_t size) { tileSize = size; }
+  Option<int64_t> tileSize{*this, "tile-size", llvm::cl::desc("M/N/K tile size"), llvm::cl::init(4)};
   StringRef getArgument() const final { return "npu-tile"; }
   StringRef getDescription() const final { return "Tile NPU matmul with boundary handling"; }
   void runOnOperation() override {
@@ -161,9 +162,9 @@ struct TilePass : PassWrapper<TilePass, OperationPass<ModuleOp>> {
           for (int64_t k = 0; k < K; k += tileSize)
             rewriter.create<npu::TileOp>(op.getLoc(), op.getA(), op.getB(), op.getC(),
               rewriter.getI64IntegerAttr(m), rewriter.getI64IntegerAttr(n), rewriter.getI64IntegerAttr(k),
-              rewriter.getI64IntegerAttr(std::min(tileSize, M - m)),
-              rewriter.getI64IntegerAttr(std::min(tileSize, N - n)),
-              rewriter.getI64IntegerAttr(std::min(tileSize, K - k)));
+              rewriter.getI64IntegerAttr(std::min<int64_t>(tileSize, M - m)),
+              rewriter.getI64IntegerAttr(std::min<int64_t>(tileSize, N - n)),
+              rewriter.getI64IntegerAttr(std::min<int64_t>(tileSize, K - k)));
       rewriter.eraseOp(op);
     }
   }
@@ -172,8 +173,9 @@ struct TilePass : PassWrapper<TilePass, OperationPass<ModuleOp>> {
 struct PlanPass : PassWrapper<PlanPass, OperationPass<ModuleOp>> {
   MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(PlanPass)
   PlanPass() = default;
-  explicit PlanPass(int64_t bytes) : capacity(bytes) {}
-  int64_t capacity = 4096;
+  PlanPass(const PlanPass &other) : PassWrapper(other) {}
+  explicit PlanPass(int64_t bytes) { capacity = bytes; }
+  Option<int64_t> capacity{*this, "sram-bytes", llvm::cl::desc("SRAM capacity in bytes"), llvm::cl::init(4096)};
   StringRef getArgument() const final { return "npu-plan-memory"; }
   StringRef getDescription() const final { return "Assign aligned DRAM/SRAM addresses"; }
   void runOnOperation() override {
@@ -217,7 +219,7 @@ struct PlanPass : PassWrapper<PlanPass, OperationPass<ModuleOp>> {
         int64_t c = b + npu::align64(tk * tn * bb);
         int64_t required = c + npu::align64(tm * tn * cb);
         if (required > capacity) {
-          op.emitError("tile exceeds SRAM capacity: requires ") << required << " bytes, available " << capacity;
+          op.emitError("tile exceeds SRAM capacity: requires ") << required << " bytes, available " << capacity.getValue();
           return signalPassFailure();
         }
         op->setAttr("a_sram", builder.getI64IntegerAttr(0));

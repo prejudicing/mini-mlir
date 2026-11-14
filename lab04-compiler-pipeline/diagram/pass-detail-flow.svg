@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1090" viewBox="0 0 1440 1090" role="img" aria-labelledby="title desc">
+<title id="title">Lab4：分析 Pass 与改写 Pass 的内部调用</title><desc id="desc">两类 Pass 都由 Pass Manager 调用，但分析只读取 IR，改写会改变 IR。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#64748b"/></marker></defs>
+<rect width="1440" height="1090" fill="#f5f8fd"/>
+<text x="720" y="52" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="33" font-weight="700" fill="#0f172a">Lab4：分析 Pass 与改写 Pass 的内部调用</text>
+<text x="720" y="92" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">两类 Pass 都由 Pass Manager 调用，但分析只读取 IR，改写会改变 IR。</text>
+<rect x="45" y="130" width="640" height="110" rx="14" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="365.0" y="164" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#2563eb">分析路径：AnalyzePass</text>
+<text x="365.0" y="196" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">Module 级 runOnOperation()</text>
+<rect x="755" y="130" width="640" height="110" rx="14" fill="white" stroke="#059669" stroke-width="2"/>
+<text x="1075.0" y="164" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#059669">改写路径：SimplifyPass</text>
+<text x="1075.0" y="196" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">嵌套在 func.func 层级的 runOnOperation()</text>
+<path d="M 365,240 L 365,275" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M 1075,240 L 1075,275" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="45" y="275" width="640" height="140" rx="14" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="365.0" y="309" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#2563eb">getAnalysis&lt;OperationCounts&gt;()</text>
+<text x="365.0" y="341" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">分析管理器返回有效缓存</text>
+<text x="365.0" y="370" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">若没有有效结果，则构造 OperationCounts(root)</text>
+<rect x="755" y="275" width="640" height="140" rx="14" fill="white" stroke="#059669" stroke-width="2"/>
+<text x="1075.0" y="309" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#059669">准备规则集合与 Greedy 配置</text>
+<text x="1075.0" y="341" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">patterns.add&lt;AddZero&gt;()；冻结规则集合</text>
+<text x="1075.0" y="370" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">config.fold = false（仅关闭此驱动器的 folding）</text>
+<path d="M 365,415 L 365,450" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M 1075,415 L 1075,450" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="45" y="450" width="640" height="140" rx="14" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="365.0" y="484" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#2563eb">需要计算时：root-&gt;walk(...) 统计</text>
+<text x="365.0" y="516" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">遍历当前 Module，统计 total / toyAdds / arithAdds</text>
+<text x="365.0" y="545" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">AnalyzePass 通过 const 引用读取结果</text>
+<rect x="755" y="450" width="640" height="140" rx="14" fill="white" stroke="#059669" stroke-width="2"/>
+<text x="1075.0" y="484" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#059669">applyPatternsGreedily(...) 驱动</text>
+<text x="1075.0" y="516" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">处理当前函数内的候选 Operation</text>
+<text x="1075.0" y="545" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">调用 AddZero::matchAndRewrite(op, rewriter)</text>
+<path d="M 365,590 L 365,625" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M 1075,590 L 1075,625" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="45" y="625" width="640" height="165" rx="14" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="365.0" y="659" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#2563eb">打印统计，并声明保留分析</text>
+<text x="365.0" y="691" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">llvm::errs() 输出报告，不修改 IR</text>
+<text x="365.0" y="720" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">markAllAnalysesPreserved()</text>
+<text x="365.0" y="749" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">后续修改 IR 的 Pass 仍可能使旧结果失效</text>
+<rect x="755" y="625" width="640" height="165" rx="14" fill="white" stroke="#059669" stroke-width="2"/>
+<text x="1075.0" y="659" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#059669">匹配与改写：x + 0 → x</text>
+<text x="1075.0" y="691" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">RHS 不匹配常量零：failure()，不改写</text>
+<text x="1075.0" y="720" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">匹配零：replaceOp(op, op.getLhs())</text>
+<text x="1075.0" y="749" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">更新结果使用关系、删除加法，然后 success()</text>
+<path d="M 1075,790 L 1075,825" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="755" y="825" width="640" height="140" rx="14" fill="white" stroke="#059669" stroke-width="2"/>
+<text x="1075.0" y="859" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#059669">驱动器继续处理受影响的操作</text>
+<text x="1075.0" y="891" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">达到稳定状态；或未能完成时向 Pass 报告失败</text>
+<text x="1075.0" y="920" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">驱动失败 → signalPassFailure() 通知 Pass Manager</text>
+<rect x="45" y="825" width="640" height="140" rx="14" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="365.0" y="859" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#64748b">注意两种 failure 的层次</text>
+<text x="365.0" y="891" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">Pattern 不匹配 ≠ 整个 Pass 失败</text>
+<text x="365.0" y="920" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">打印到 errs() 也不表示 Pass 失败</text>
+<text x="720" y="1020" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">SimplifyPass 关闭 folding，不影响后续独立 Canonicalizer Pass 继续执行 folding。</text>
+<text x="720" y="1060" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="19" font-weight="400" fill="#334155">分析缓存记录的是某个时刻的 IR 信息，不能在改变 IR 后无条件复用。</text>
+</svg>

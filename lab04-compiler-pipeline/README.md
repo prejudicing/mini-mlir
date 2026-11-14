@@ -4,6 +4,8 @@
 
 本实验将 Lab1 的重写规则与 Lab3 的转换组合起来，增加缓存式 IR 分析、标准优化、LLVM Lowering 和 lit/FileCheck 测试，最终通过 lli 执行生成的 LLVM IR。
 
+新增 [调用流程图](diagram/README.md)：从 main 和注册回调到两条流水线执行，另附 AnalyzePass 与 SimplifyPass 的内部调用图。
+
 ## 1. 构建与运行
 
 在项目根目录执行：

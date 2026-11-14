@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="2030" viewBox="0 0 1440 2030" role="img" aria-labelledby="title desc">
+<title id="title">Lab4：程序入口、流水线注册与执行</title><desc id="desc">选择一条命令行流水线；注册、构建流水线、执行 IR 是三个不同阶段。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#64748b"/></marker></defs>
+<rect width="1440" height="2030" fill="#f5f8fd"/>
+<text x="720" y="52" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="33" font-weight="700" fill="#0f172a">Lab4：程序入口、流水线注册与执行</text>
+<text x="720" y="92" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">选择一条命令行流水线；注册、构建流水线、执行 IR 是三个不同阶段。</text>
+<rect x="100" y="125" width="1240" height="120" rx="14" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="720.0" y="159" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#2563eb">① 程序启动：tools/compiler-opt.cpp → main()</text>
+<text x="720.0" y="191" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">创建 DialectRegistry，登记 Toy / Arith / Func / LLVM 方言</text>
+<text x="720.0" y="220" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">调用 registerLab4Pipelines()，然后进入 MlirOptMain(argc, argv, ..., registry)</text>
+<path d="M 720,245 L 720,275" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="100" y="275" width="1240" height="145" rx="14" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="720.0" y="309" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#64748b">② 注册阶段：lib/Pipelines.cpp → registerLab4Pipelines()</text>
+<text x="720.0" y="341" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">注册单个 Pass：Toy → Arith、AnalyzePass、SimplifyPass</text>
+<text x="720.0" y="370" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">注册流水线名称：lab4-optimize、lab4-lower-to-llvm，以及各自的 Lambda 构建回调</text>
+<text x="720.0" y="399" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">此时只登记创建方式；尚未运行 Pattern，也没有修改输入 IR</text>
+<path d="M 720,420 L 720,450" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="100" y="450" width="1240" height="120" rx="14" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="720.0" y="484" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#2563eb">③ MlirOptMain 根据命令行组织任务</text>
+<text x="720.0" y="516" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">处理参数、加载所需方言、解析并验证输入 IR</text>
+<text x="720.0" y="545" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">查找所选流水线，调用注册的 Lambda，把 Pass 按顺序加入管理器</text>
+<path d="M 720,570 L 720,590 L 365,590 L 365,620" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M 720,590 L 1075,590 L 1075,620" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="45" y="620" width="640" height="140" rx="14" fill="white" stroke="#059669" stroke-width="2"/>
+<text x="365.0" y="654" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#059669">选项 A：--lab4-optimize</text>
+<text x="365.0" y="686" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">Lambda 调用 buildOptimizePipeline(pm)</text>
+<text x="365.0" y="715" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">构建 6 个公共优化步骤</text>
+<rect x="755" y="620" width="640" height="140" rx="14" fill="white" stroke="#7c3aed" stroke-width="2"/>
+<text x="1075.0" y="654" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#7c3aed">选项 B：--lab4-lower-to-llvm</text>
+<text x="1075.0" y="686" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">Lambda 先调用 buildOptimizePipeline(pm)</text>
+<text x="1075.0" y="715" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">再追加 Arith / Func → LLVM 等 3 个步骤</text>
+<path d="M 365,760 L 365,790 L 720,790 L 720,820" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M 1075,760 L 1075,790 L 720,790" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="100" y="820" width="1240" height="390" rx="14" fill="white" stroke="#059669" stroke-width="2"/>
+<text x="720.0" y="854" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#059669">④ 执行阶段：Pass Manager 按流水线顺序调用各 Pass</text>
+<text x="720.0" y="886" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">1．AnalyzePass：getAnalysis&lt;OperationCounts&gt;() → 打印优化前统计</text>
+<text x="720.0" y="915" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">↓</text>
+<text x="720.0" y="944" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">2．Toy → Arith：runOnOperation() → applyFullConversion() → 常量 / 加法转换规则</text>
+<text x="720.0" y="973" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">↓</text>
+<text x="720.0" y="1002" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">3．函数级 SimplifyPass：Greedy Rewrite → AddZero → replaceOp()</text>
+<text x="720.0" y="1031" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">↓</text>
+<text x="720.0" y="1060" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">4．Canonicalizer：规范化、folding；5．CSE：消除满足安全条件的重复计算</text>
+<text x="720.0" y="1089" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">↓</text>
+<text x="720.0" y="1118" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">6．AnalyzePass：获取当前有效的分析结果 → 打印优化后统计</text>
+<text x="720" y="1180" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">第 3 步由 addNestedPass&lt;func::FuncOp&gt;() 安排到各函数；其他公共步骤位于外层 Module 流水线。</text>
+<path d="M 720,1210 L 720,1270 L 365,1270 L 365,1300" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M 720,1270 L 1075,1270 L 1075,1300" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="45" y="1300" width="640" height="140" rx="14" fill="white" stroke="#059669" stroke-width="2"/>
+<text x="365.0" y="1334" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#059669">A．公共优化完成，输出 Arith MLIR</text>
+<text x="365.0" y="1366" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">MlirOptMain 打印 IR；分析日志写入 stderr</text>
+<text x="365.0" y="1395" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">示例结果：arith.constant 30</text>
+<rect x="755" y="1300" width="640" height="190" rx="14" fill="white" stroke="#7c3aed" stroke-width="2"/>
+<text x="1075.0" y="1334" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#7c3aed">B．继续执行追加的 LLVM 转换</text>
+<text x="1075.0" y="1366" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">7．createArithToLLVMConversionPass()</text>
+<text x="1075.0" y="1395" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">8．createConvertFuncToLLVMPass()</text>
+<text x="1075.0" y="1424" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">9．createReconcileUnrealizedCastsPass()</text>
+<text x="1075.0" y="1453" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">最后由 MlirOptMain 输出 LLVM Dialect MLIR</text>
+<path d="M 1075,1490 L 1075,1520" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="755" y="1520" width="640" height="130" rx="14" fill="white" stroke="#d97706" stroke-width="2"/>
+<text x="1075.0" y="1554" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#d97706">⑤ 外部命令：导出真正的 LLVM IR</text>
+<text x="1075.0" y="1586" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">mlir-translate-20 --mlir-to-llvmir</text>
+<text x="1075.0" y="1615" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">lowered.mlir → program.ll</text>
+<path d="M 1075,1650 L 1075,1680" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="755" y="1680" width="640" height="130" rx="14" fill="white" stroke="#d97706" stroke-width="2"/>
+<text x="1075.0" y="1714" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#d97706">⑥ 外部命令：执行 LLVM IR</text>
+<text x="1075.0" y="1746" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">lli-20 program.ll</text>
+<text x="1075.0" y="1775" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">运行 @main；示例返回值为 30</text>
+<rect x="45" y="1520" width="640" height="290" rx="14" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="365.0" y="1554" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#64748b">阅读时要分清</text>
+<text x="365.0" y="1586" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">注册：保存 Pass / 流水线的创建方式</text>
+<text x="365.0" y="1615" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">构建：Lambda 把 Pass 加入 pm</text>
+<text x="365.0" y="1644" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">执行：Pass Manager 调用 runOnOperation()</text>
+<text x="365.0" y="1673" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">LLVM Dialect 仍属于 MLIR</text>
+<text x="365.0" y="1702" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">导出 LLVM IR 与 lli 执行是后续独立命令</text>
+<text x="365.0" y="1731" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">本例两条流水线的第 1～6 步完全复用</text>
+<rect x="100" y="1850" width="1240" height="120" rx="14" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="720.0" y="1884" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#64748b">测试入口：CTest → lit → RUN 命令</text>
+<text x="720.0" y="1916" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">RUN 调用 compiler-opt，再用 FileCheck 检查 IR / 日志</text>
+<text x="720.0" y="1945" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">完整执行测试还会调用 mlir-translate 和 check_exit.py，核对 lli 返回 30</text>
+<text x="720" y="2005" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="17" font-weight="400" fill="#334155">配置依据：tools/compiler-opt.cpp、lib/Pipelines.cpp、tests/pipeline.mlir。箭头表示调用或处理顺序。</text>
+</svg>

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1750" viewBox="0 0 1600 1750" role="img" aria-labelledby="title desc">
+<title id="title">Lab3：CMake、CTest、lit 和 FileCheck 的关系</title>
+<desc id="desc">同一个 MLIR 测试文件中的 RUN、CHECK 与 IR 正文由不同工具读取。FileCheck 同时接收输出文本与检查规则，捕获 SSA 名称并核对返回值。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#64748b"/></marker></defs>
+<rect width="1600" height="1750" fill="#f5f8fd"/>
+<text x="800" y="52" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="33" font-weight="700" fill="#0f172a">Lab3：谁执行命令，谁读取注释，谁检查输出？</text>
+<text x="800" y="92" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="22" font-weight="400" fill="#334155">重点：FileCheck 有两份输入——待检查的程序输出，以及测试文件里的 CHECK 规则。</text>
+<rect x="60" y="130" width="680" height="130" rx="14" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="400.0" y="166" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" fill="#2563eb">CMake：配置与登记</text>
+<text x="400.0" y="202" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">构建 toy-convert-opt；生成 lit.site.cfg.py</text>
+<text x="400.0" y="233" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">add_test(...) 登记启动 lit 的命令</text>
+<path d="M 740,195 L 850,195" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="795" y="177" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="19" font-weight="400" fill="#334155">登记</text>
+<rect x="850" y="130" width="680" height="130" rx="14" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="1190.0" y="166" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" fill="#2563eb">CTest：统一测试入口</text>
+<text x="1190.0" y="202" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">用户运行 ctest --test-dir build ...</text>
+<text x="1190.0" y="233" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">CTest 执行已登记的测试命令，启动 lit</text>
+<path d="M 1190,260 L 1190,320" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="60" y="320" width="680" height="160" rx="14" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="400.0" y="356" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" fill="#64748b">lit 配置：提供路径和规则</text>
+<text x="400.0" y="392" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">lit.site.cfg.py：具体工具路径，加载 lit.cfg.py</text>
+<text x="400.0" y="423" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">lit.cfg.py：寻找 .mlir、执行 Shell 命令</text>
+<text x="400.0" y="454" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">替换 %toy-opt / %FileCheck；%s 是内置占位符</text>
+<path d="M 740,400 L 850,400" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="795" y="382" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="19" font-weight="400" fill="#334155">读取</text>
+<rect x="850" y="320" width="680" height="160" rx="14" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="1190.0" y="356" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" fill="#2563eb">lit：找到文件并读取 RUN</text>
+<text x="1190.0" y="392" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">不负责理解 IR 语义，也不负责执行 CHECK 匹配</text>
+<text x="1190.0" y="423" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">将 RUN 中的占位符替换为实际路径</text>
+<text x="1190.0" y="454" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">通过 Shell 启动转换程序和 FileCheck</text>
+<path d="M 1190,480 L 1190,550" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="60" y="550" width="680" height="420" rx="14" fill="white" stroke="#7c3aed" stroke-width="2"/>
+<text x="400.0" y="586" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" fill="#7c3aed">同一份测试文件：tests/convert.mlir</text>
+<text x="400" y="630" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="700" fill="#2563eb">A．RUN 注释：给 lit 的执行命令</text>
+<text x="400" y="665" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">// RUN: %toy-opt %s ... | %FileCheck %s</text>
+<text x="400" y="730" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="700" fill="#d97706">B．CHECK 注释：给 FileCheck 的匹配规则</text>
+<text x="400" y="765" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">// CHECK: %[[B:.*]] = arith.addi ...</text>
+<text x="400" y="798" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">// CHECK: return %[[C]] : i32</text>
+<text x="400" y="863" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="700" fill="#059669">C．IR 正文：给转换程序的输入</text>
+<text x="400" y="900" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">module { func.func @main() ... toy.add ... }</text>
+<text x="400" y="941" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="19" font-weight="400" fill="#334155">对 MLIR 解析器，RUN / CHECK 都是普通注释。</text>
+<path d="M 740,630 L 850,630" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="795" y="612" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="19" font-weight="400" fill="#334155">RUN</text>
+<rect x="850" y="550" width="680" height="210" rx="14" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="1190.0" y="586" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" fill="#2563eb">占位符展开后，命令效果相当于</text>
+<text x="1190.0" y="622" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">./build/toy-convert-opt tests/convert.mlir</text>
+<text x="1190.0" y="653" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">--convert-toy-to-arith --verify-each</text>
+<text x="1190.0" y="684" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">| FileCheck-20 tests/convert.mlir</text>
+<text x="1190.0" y="715" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">左边程序的标准输出，经管道交给右边程序</text>
+<rect x="880" y="815" width="620" height="155" rx="14" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="1190.0" y="851" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" fill="#64748b">下面两条箭头分别表示输入数据来源</text>
+<text x="1190.0" y="887" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">IR 正文 → toy-convert-opt</text>
+<text x="1190.0" y="918" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">CHECK 规则 → FileCheck</text>
+<text x="1190.0" y="949" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">RUN 命令负责将两个程序组织成管道</text>
+<path d="M 400,970 L 400,1060" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="400" y="1010" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#059669">读取 IR 正文，解析成内存 IR</text>
+<path d="M 740,780 L 795,780 L 795,1150 L 850,1150" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="770" y="1020" text-anchor="end" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="19" font-weight="400" fill="#d97706">CHECK 规则</text>
+<rect x="60" y="1060" width="640" height="195" rx="14" fill="white" stroke="#059669" stroke-width="2"/>
+<text x="380.0" y="1096" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" fill="#059669">toy-convert-opt：执行转换 Pass</text>
+<text x="380.0" y="1132" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">Toy IR → Arith IR → 打印标准输出</text>
+<text x="380.0" y="1163" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">例如输出：</text>
+<text x="380.0" y="1194" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">%0 = arith.addi %arg0, %arg1 : i32</text>
+<text x="380.0" y="1225" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">return %0 : i32</text>
+<path d="M 700,1210 L 755,1210 L 755,1300 L 1190,1300 L 1190,1255" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="1040" y="1330" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#059669">待检查文本：标准输出，经 Shell 管道传递</text>
+<rect x="850" y="1060" width="680" height="195" rx="14" fill="white" stroke="#d97706" stroke-width="2"/>
+<text x="1190.0" y="1096" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" fill="#d97706">FileCheck：将规则与输出进行匹配</text>
+<text x="1190.0" y="1132" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">一份输入：从 stdin 接收转换后的 IR 文本</text>
+<text x="1190.0" y="1163" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">另一份输入：从测试文件读取 CHECK 规则</text>
+<text x="1190.0" y="1194" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">按顺序匹配；捕获并复用 SSA 名称</text>
+<text x="1190.0" y="1225" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">匹配成功返回 0；不符合要求则返回失败</text>
+<rect x="60" y="1390" width="1470" height="210" rx="14" fill="white" stroke="#7c3aed" stroke-width="2"/>
+<text x="795.0" y="1426" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" fill="#7c3aed">单独理解你问的 SUM 捕获语法（示意，不是当前测试文件的原样内容）</text>
+<text x="795.0" y="1462" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">// CHECK: %[[SUM:.*]] = arith.addi    → 在示例输出中捕获 SUM = 0</text>
+<text x="795.0" y="1493" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">// CHECK: return %[[SUM]] : i32      → 要求后面出现 return %0 : i32</text>
+<text x="795.0" y="1524" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">因此既检查存在加法，也检查返回的是那条加法的结果；打印器换成 %7 也能匹配。</text>
+<text x="795.0" y="1555" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="400" fill="#334155">只有引用 [[SUM]] 而没有前面的捕获定义不够；SUM 不是 C++ 变量。</text>
+<text x="800" y="1650" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="700" fill="#0f172a">结果返回：FileCheck 的退出状态 → lit 判定该 RUN / 测试是否通过 → CTest 汇总。</text>
+<text x="800" y="1700" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="22" font-weight="400" fill="#334155">CMake / CTest 不解释 CHECK；lit 负责执行 RUN；FileCheck 负责解释 CHECK。</text>
+</svg>

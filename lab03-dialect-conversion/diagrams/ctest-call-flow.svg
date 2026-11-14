@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1720" viewBox="0 0 1440 1720" role="img" aria-labelledby="title desc">
+<title id="title">Lab3 CTest 调用流程</title>
+<desc id="desc">CMake 登记测试后，CTest 启动 lit；lit 加载配置并执行 RUN 指令；正常转换使用 FileCheck，错误用例使用 verify-diagnostics，最终汇总退出状态。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#64748b"/></marker></defs>
+<rect width="1440" height="1720" fill="#f5f8fd"/>
+<text x="720" y="52" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#0f172a">Lab3：从 CTest 到转换 Pass 的调用流程</text>
+<text x="720" y="91" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="22" font-weight="400" fill="#334155">前置条件：工具已构建；CTest 本身不会自动编译 C++</text>
+<rect x="150" y="125" width="1140" height="120" rx="14" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="720.0" y="160" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#64748b">准备阶段：CMake 配置</text>
+<text x="720.0" y="193" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">add_lab_lit_test(toy-convert-opt) → add_test(NAME Lab03-lit ...)</text>
+<text x="720.0" y="222" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">生成 build/tests/lit.site.cfg.py，并登记启动 lit 的命令</text>
+<path d="M 720,245 L 720,275" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="150" y="275" width="1140" height="110" rx="14" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+<text x="720.0" y="310" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#2563eb">① 用户运行 CTest</text>
+<text x="720.0" y="343" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">ctest --test-dir lab03-dialect-conversion/build --output-on-failure</text>
+<path d="M 720,385 L 720,415" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="150" y="415" width="1140" height="110" rx="14" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+<text x="720.0" y="450" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#2563eb">② CTest 执行登记的 Lab03-lit 测试</text>
+<text x="720.0" y="483" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">python3 /usr/lib/llvm-20/build/utils/lit/lit.py -v &lt;Lab3&gt;/build/tests</text>
+<path d="M 720,525 L 720,555" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="150" y="555" width="1140" height="125" rx="14" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+<text x="720.0" y="590" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#2563eb">③ lit 加载配置文件</text>
+<text x="720.0" y="623" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">build/tests/lit.site.cfg.py：设置工具路径 → load_config(...) 加载 tests/lit.cfg.py</text>
+<text x="720.0" y="652" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">lit.cfg.py：指定 .mlir 测试、Shell 执行方式，以及工具占位符替换规则</text>
+<path d="M 720,680 L 720,710" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="150" y="710" width="1140" height="120" rx="14" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+<text x="720.0" y="745" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#2563eb">④ lit 找到测试文件，读取 // RUN: 指令</text>
+<text x="720.0" y="778" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">%toy-opt → toy-convert-opt 路径；%FileCheck → FileCheck 路径</text>
+<text x="720.0" y="807" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">%s → 当前测试文件路径（lit 内置），随后交给 Shell 执行</text>
+<path d="M 720,830 L 720,850 L 365,850 L 365,880" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M 720,850 L 1075,850 L 1075,880" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="45" y="880" width="640" height="130" rx="14" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+<text x="365.0" y="915" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#059669">⑤ A．正常转换测试：tests/convert.mlir</text>
+<text x="365.0" y="948" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">%toy-opt %s --convert-toy-to-arith --verify-each</text>
+<text x="365.0" y="977" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">| %FileCheck %s</text>
+<rect x="755" y="880" width="640" height="130" rx="14" fill="#ffffff" stroke="#d97706" stroke-width="2"/>
+<text x="1075.0" y="915" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#d97706">⑤ B．预期失败测试：tests/illegal.mlir</text>
+<text x="1075.0" y="948" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">%toy-opt %s --allow-unregistered-dialect</text>
+<text x="1075.0" y="977" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">--convert-toy-to-arith --verify-diagnostics</text>
+<path d="M 365,1010 L 365,1040" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M 1075,1010 L 1075,1040" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="45" y="1040" width="640" height="175" rx="14" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+<text x="365.0" y="1075" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#059669">⑥ 转换程序内部</text>
+<text x="365.0" y="1108" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">main()：注册方言、注册转换 Pass</text>
+<text x="365.0" y="1137" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">MlirOptMain：解析输入并选择命令行指定的 Pass</text>
+<text x="365.0" y="1166" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">runOnOperation() → applyFullConversion()</text>
+<text x="365.0" y="1195" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">转换规则创建 Arith Operation，输出 IR</text>
+<rect x="755" y="1040" width="640" height="175" rx="14" fill="#ffffff" stroke="#d97706" stroke-width="2"/>
+<text x="1075.0" y="1075" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#d97706">⑥ 转换程序内部</text>
+<text x="1075.0" y="1108" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">同样启动转换 Pass</text>
+<text x="1075.0" y="1137" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">unknown.work 无法合法化，产生错误诊断</text>
+<text x="1075.0" y="1166" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">--verify-diagnostics 对照 expected-error 注释</text>
+<text x="1075.0" y="1195" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">诊断符合预期 → 测试命令返回成功</text>
+<path d="M 365,1215 L 365,1245" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="45" y="1245" width="640" height="125" rx="14" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+<text x="365.0" y="1280" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#059669">⑦ FileCheck 检查输出文本</text>
+<text x="365.0" y="1313" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">读取同一测试文件里的 CHECK / CHECK-LABEL 等规则</text>
+<text x="365.0" y="1342" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">确认转换结果出现 arith.*，并满足匹配顺序</text>
+<rect x="755" y="1245" width="640" height="125" rx="14" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+<text x="1075.0" y="1280" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#d97706">注意：两种检查方式不同</text>
+<text x="1075.0" y="1313" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">正常转换：FileCheck 检查输出 IR</text>
+<text x="1075.0" y="1342" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">预期错误：工具自身检查诊断；这条 RUN 不调用 FileCheck</text>
+<path d="M 365,1370 L 365,1400 L 720,1400 L 720,1430" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M 1075,1215 L 1415,1215 L 1415,1400 L 720,1400" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="150" y="1430" width="1140" height="110" rx="14" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>
+<text x="720.0" y="1465" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#7c3aed">⑧ lit 汇总各测试中 RUN 命令的执行结果</text>
+<text x="720.0" y="1498" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">所有命令满足成功条件 → PASS；出现不符合预期的失败 → FAIL</text>
+<path d="M 720,1540 L 720,1570" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="150" y="1570" width="1140" height="105" rx="14" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>
+<text x="720.0" y="1605" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700" fill="#7c3aed">⑨ CTest 汇总并返回结果</text>
+<text x="720.0" y="1638" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="400" fill="#334155">展示通过 / 失败；--output-on-failure 在失败时展示测试输出</text>
+<text x="720" y="1703" text-anchor="middle" font-family="Noto Sans SC, Microsoft YaHei, sans-serif" font-size="17" font-weight="400" fill="#334155">说明：convert.mlir 还有一次连续运行转换的检查；图中展示其首条 RUN 和两类测试路径。</text>
+</svg>
