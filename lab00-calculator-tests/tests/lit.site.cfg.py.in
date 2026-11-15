@@ -1,0 +1,6 @@
+# CMake 自动生成；修改源目录中的 .in 模板，不要修改 build 下的文件。
+config.calculator = r"@CMAKE_CURRENT_BINARY_DIR@/bin/calculator"
+config.filecheck = r"@FILECHECK_EXECUTABLE@"
+config.python = r"@Python3_EXECUTABLE@"
+config.test_exec_root = r"@CMAKE_CURRENT_BINARY_DIR@/tests"
+lit_config.load_config(config, r"@CMAKE_CURRENT_SOURCE_DIR@/tests/lit.cfg.py")

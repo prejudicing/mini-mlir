@@ -1,0 +1,4 @@
+# RUN: %python %S/check_error.py %calculator | %FileCheck %s --match-full-lines
+# RUN: %python %S/check_error.py %calculator add 1 | %FileCheck %s --match-full-lines
+# RUN: %python %S/check_error.py %calculator add 1 2 3 | %FileCheck %s --match-full-lines
+# CHECK: Usage: calculator <add|sub|mul|div> <lhs> <rhs>

@@ -1,0 +1,8 @@
+# RUN: %calculator add -3 5 | %FileCheck %s --check-prefix=NEG --match-full-lines
+# RUN: %calculator mul 0 -9 | %FileCheck %s --check-prefix=ZERO --match-full-lines
+# RUN: %calculator div -7 2 | %FileCheck %s --check-prefix=DIV --match-full-lines
+# RUN: %calculator mul 1000000000 1000000000 | %FileCheck %s --check-prefix=BIG --match-full-lines
+# NEG: result: 2
+# ZERO: result: 0
+# DIV: result: -3
+# BIG: result: 1000000000000000000

@@ -1,0 +1,9 @@
+# RUN: %python %S/check_error.py %calculator div 1 0 | %FileCheck %s --check-prefix=ZERO --match-full-lines
+# RUN: %python %S/check_error.py %calculator pow 2 3 | %FileCheck %s --check-prefix=OP --match-full-lines
+# RUN: %python %S/check_error.py %calculator add abc 2 | %FileCheck %s --check-prefix=INPUT --match-full-lines
+# RUN: %python %S/check_error.py %calculator add 12x 2 | %FileCheck %s --check-prefix=INPUT --match-full-lines
+# RUN: %python %S/check_error.py %calculator add 1000000001 2 | %FileCheck %s --check-prefix=INPUT --match-full-lines
+# RUN: %python %S/check_error.py %calculator add 99999999999999999999999 2 | %FileCheck %s --check-prefix=INPUT --match-full-lines
+# ZERO: error: division by zero
+# OP: error: unknown operation 'pow'
+# INPUT: error: operands must be integers in [-1000000000, 1000000000]

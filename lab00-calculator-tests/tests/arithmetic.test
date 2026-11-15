@@ -1,0 +1,8 @@
+# RUN: %calculator add 3 5 | %FileCheck %s --check-prefix=ADD --match-full-lines
+# RUN: %calculator sub 3 5 | %FileCheck %s --check-prefix=SUB --match-full-lines
+# RUN: %calculator mul 6 7 | %FileCheck %s --check-prefix=MUL --match-full-lines
+# RUN: %calculator div 7 2 | %FileCheck %s --check-prefix=DIV --match-full-lines
+# ADD: result: 8
+# SUB: result: -2
+# MUL: result: 42
+# DIV: result: 3
