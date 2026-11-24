@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1712" viewBox="0 0 1900 1712" role="img" aria-labelledby="title desc">
+<title id="title">Lab05 · Mini NPU 编译器：文件结构与职责</title>
+<desc id="desc">文件树左侧展示源码路径，右侧说明用途；不介绍 Markdown/HTML 文档，不展开 build 生成目录和图片资源。</desc>
+<rect width="1900" height="1712" fill="#f5f8fd"/>
+<style>text {font-family:"Noto Sans SC","Microsoft YaHei",sans-serif;} .tree {font-family:"DejaVu Sans Mono","Noto Sans SC",monospace;white-space:pre;}</style>
+<text x="48" y="58" font-size="32" font-weight="700" fill="#0f172a">Lab05 · Mini NPU 编译器 · 文件结构与职责</text>
+<text x="48" y="100" font-size="20" fill="#475569">只介绍程序、配置、测试与输入数据；省略 Markdown/HTML 文档、build 生成产物及图片明细。</text>
+<text x="48" y="155" font-size="22" font-weight="700" fill="#334155">文件结构</text>
+<text x="770" y="155" font-size="22" font-weight="700" fill="#334155">用途 / 在实验中的职责</text>
+<rect x="32" y="179" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="208" font-size="21" fill="#1d4ed8" font-weight="700">lab05-mini-npu-compiler/</text>
+<text x="770" y="208" font-size="21" fill="#334155">实验源码根目录</text>
+<text class="tree" xml:space="preserve" x="48" y="250" font-size="21" fill="#1d4ed8" font-weight="700">├── diagrams/</text>
+<text x="770" y="250" font-size="21" fill="#334155">流程图与本文件结构图（不展开图片）</text>
+<rect x="32" y="263" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="292" font-size="21" fill="#1d4ed8" font-weight="700">├── examples/</text>
+<text x="770" y="292" font-size="21" fill="#334155">示例 IR 与输入数据</text>
+<text class="tree" xml:space="preserve" x="48" y="334" font-size="21" fill="#0f172a" font-weight="400">│   ├── matmul-int8.mlir</text>
+<text x="770" y="334" font-size="21" fill="#334155">原生整数输入示例：i8×i8→i32 累加</text>
+<rect x="32" y="347" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="376" font-size="21" fill="#0f172a" font-weight="400">│   ├── matmul.mlir</text>
+<text x="770" y="376" font-size="21" fill="#334155">FP32 输入示例：5×7 与 7×6 的 buffer 矩阵乘加</text>
+<text class="tree" xml:space="preserve" x="48" y="418" font-size="21" fill="#0f172a" font-weight="400">│   └── quantization-input.json</text>
+<text x="770" y="418" font-size="21" fill="#334155">INT8 演示使用的真实浮点输入数据及矩阵尺寸</text>
+<rect x="32" y="431" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="460" font-size="21" fill="#1d4ed8" font-weight="700">├── include/</text>
+<text x="770" y="460" font-size="21" fill="#334155">公开 C++ / TableGen 定义</text>
+<text class="tree" xml:space="preserve" x="48" y="502" font-size="21" fill="#1d4ed8" font-weight="700">│   └── NPU/</text>
+<text x="770" y="502" font-size="21" fill="#334155">NPU 方言与编译接口</text>
+<rect x="32" y="515" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="544" font-size="21" fill="#0f172a" font-weight="400">│       ├── Compiler.h</text>
+<text x="770" y="544" font-size="21" fill="#334155">声明 Pass 注册与伪指令发射接口</text>
+<text class="tree" xml:space="preserve" x="48" y="586" font-size="21" fill="#0f172a" font-weight="400">│       ├── NPU.h</text>
+<text x="770" y="586" font-size="21" fill="#334155">公开方言/操作声明、验证函数及字节数/对齐工具</text>
+<rect x="32" y="599" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="628" font-size="21" fill="#0f172a" font-weight="400">│       └── NPU.td</text>
+<text x="770" y="628" font-size="21" fill="#334155">定义 npu.matmul、npu.tile 的参数、格式与验证入口</text>
+<text class="tree" xml:space="preserve" x="48" y="670" font-size="21" fill="#1d4ed8" font-weight="700">├── lib/</text>
+<text x="770" y="670" font-size="21" fill="#334155">方言、Pass 或代码生成实现</text>
+<rect x="32" y="683" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="712" font-size="21" fill="#0f172a" font-weight="400">│   ├── Emitter.cpp</text>
+<text x="770" y="712" font-size="21" fill="#334155">将规划后的 tile 发射为 LOAD2D、MATMUL、STORE2D 等文本</text>
+<text class="tree" xml:space="preserve" x="48" y="754" font-size="21" fill="#0f172a" font-weight="400">│   ├── NPUDialect.cpp</text>
+<text x="770" y="754" font-size="21" fill="#334155">注册 NPU 操作，验证矩阵、量化元数据和 tile 边界</text>
+<rect x="32" y="767" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="796" font-size="21" fill="#0f172a" font-weight="400">│   └── Passes.cpp</text>
+<text x="770" y="796" font-size="21" fill="#334155">Linalg Lowering、INT8 接口转换、分块及 DRAM/SRAM 规划</text>
+<text class="tree" xml:space="preserve" x="48" y="838" font-size="21" fill="#1d4ed8" font-weight="700">├── scripts/</text>
+<text x="770" y="838" font-size="21" fill="#334155">安装、导出或图解辅助脚本</text>
+<rect x="32" y="851" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="880" font-size="21" fill="#0f172a" font-weight="400">│   └── dump_ir_stages.py</text>
+<text x="770" y="880" font-size="21" fill="#334155">逐阶段调用编译工具，保存各层 IR、伪指令与模拟报告</text>
+<text class="tree" xml:space="preserve" x="48" y="922" font-size="21" fill="#1d4ed8" font-weight="700">├── tests/</text>
+<text x="770" y="922" font-size="21" fill="#334155">自动化测试与测试配置</text>
+<rect x="32" y="935" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="964" font-size="21" fill="#0f172a" font-weight="400">│   ├── capacity.mlir</text>
+<text x="770" y="964" font-size="21" fill="#334155">检查 tile 所需 SRAM 超过容量时拒绝编译</text>
+<text class="tree" xml:space="preserve" x="48" y="1006" font-size="21" fill="#0f172a" font-weight="400">│   ├── int8-invalid.mlir</text>
+<text x="770" y="1006" font-size="21" fill="#334155">检查非法 INT8 矩阵类型组合的诊断</text>
+<rect x="32" y="1019" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="1048" font-size="21" fill="#0f172a" font-weight="400">│   ├── int8.mlir</text>
+<text x="770" y="1048" font-size="21" fill="#334155">检查量化后的类型、scale、内存规划和整数指令</text>
+<text class="tree" xml:space="preserve" x="48" y="1090" font-size="21" fill="#0f172a" font-weight="400">│   ├── int8_numerical.py</text>
+<text x="770" y="1090" font-size="21" fill="#334155">INT8 精确计算、量化误差和非法参数的回归验证</text>
+<rect x="32" y="1103" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="1132" font-size="21" fill="#0f172a" font-weight="400">│   ├── invalid.mlir</text>
+<text x="770" y="1132" font-size="21" fill="#334155">检查形状、布局、操作等不合法情况的诊断</text>
+<text class="tree" xml:space="preserve" x="48" y="1174" font-size="21" fill="#0f172a" font-weight="400">│   ├── lit.cfg.py</text>
+<text x="770" y="1174" font-size="21" fill="#334155">设置 lit 的测试发现、Shell 格式及命令替换规则</text>
+<rect x="32" y="1187" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="1216" font-size="21" fill="#0f172a" font-weight="400">│   ├── lit.site.cfg.py.in</text>
+<text x="770" y="1216" font-size="21" fill="#334155">由 CMake 填入工具路径，生成 build 中的 lit 配置</text>
+<text class="tree" xml:space="preserve" x="48" y="1258" font-size="21" fill="#0f172a" font-weight="400">│   ├── numerical.py</text>
+<text x="770" y="1258" font-size="21" fill="#334155">多种形状/分块/种子下验证 FP32 数值与累加语义</text>
+<rect x="32" y="1271" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="1300" font-size="21" fill="#0f172a" font-weight="400">│   └── pipeline.mlir</text>
+<text x="770" y="1300" font-size="21" fill="#334155">检查 Lowering、内存属性及最终伪指令文本</text>
+<text class="tree" xml:space="preserve" x="48" y="1342" font-size="21" fill="#1d4ed8" font-weight="700">├── tools/</text>
+<text x="770" y="1342" font-size="21" fill="#334155">命令行可执行工具入口</text>
+<rect x="32" y="1355" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="1384" font-size="21" fill="#0f172a" font-weight="400">│   ├── npu-opt.cpp</text>
+<text x="770" y="1384" font-size="21" fill="#334155">编译驱动入口：解析 IR，运行单个 Pass 或 npu-compile</text>
+<text class="tree" xml:space="preserve" x="48" y="1426" font-size="21" fill="#0f172a" font-weight="400">│   └── npu-translate.cpp</text>
+<text x="770" y="1426" font-size="21" fill="#334155">发射工具入口：读取规划后的 IR，输出伪指令程序</text>
+<rect x="32" y="1439" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="1468" font-size="21" fill="#0f172a" font-weight="400">├── CMakeLists.txt</text>
+<text x="770" y="1468" font-size="21" fill="#334155">配置构建目标、链接依赖及测试入口</text>
+<text class="tree" xml:space="preserve" x="48" y="1510" font-size="21" fill="#0f172a" font-weight="400">├── int8_demo.py</text>
+<text x="770" y="1510" font-size="21" fill="#334155">组织真实浮点数据的 INT8 编译、模拟执行和误差验证</text>
+<rect x="32" y="1523" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="1552" font-size="21" fill="#0f172a" font-weight="400">├── quantize.py</text>
+<text x="770" y="1552" font-size="21" fill="#334155">宿主侧 AbsMax 校准、实际数据量化、反量化和重定标</text>
+<text class="tree" xml:space="preserve" x="48" y="1594" font-size="21" fill="#0f172a" font-weight="400">└── simulator.py</text>
+<text x="770" y="1594" font-size="21" fill="#334155">功能模型：解释伪指令，模拟内存搬运与 FP32/INT8 计算</text>
+<text x="48" y="1684" font-size="18" fill="#64748b">按实际源码目录生成 · 重新生成：python3 scripts/render-lab-file-trees.py --png（PNG 需要 CairoSVG 与中文字体）</text>
+</svg>

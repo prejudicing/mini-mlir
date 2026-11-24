@@ -1,5 +1,7 @@
 # Lab4：编译器综合实践
 
+文件结构与职责：[PNG 图](diagrams/file-structure.png) · [可缩放 SVG](diagrams/file-structure.svg)。
+
 零基础学习请先看 [图解教程](TUTORIAL.md)，本文保留实现与运行参考。
 
 本实验将 Lab1 的重写规则与 Lab3 的转换组合起来，增加缓存式 IR 分析、标准优化、LLVM Lowering 和 lit/FileCheck 测试，最终通过 lli 执行生成的 LLVM IR。

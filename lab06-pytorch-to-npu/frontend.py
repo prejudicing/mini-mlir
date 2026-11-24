@@ -10,11 +10,13 @@ from torch.export.graph_signature import InputKind, OutputKind
 
 
 @dataclass(frozen=True)
+# 只保存编译需要的静态 M/N/K；实际张量数据由 run.py 单独传给模拟器。
 class MatmulSpec:
     m: int
     n: int
     k: int
 
+    # ABI 是调用约定：参数顺序、布局，以及每次执行前必须清零输出 C。
     def manifest(self):
         return dict(**asdict(self), dtype="f32", layout="row-major",
                     arguments=["A", "B", "C"], output="C",
@@ -22,6 +24,7 @@ class MatmulSpec:
                     semantics="C = A @ B", backend_semantics="C += A * B")
 
 
+# 将前端接受范围限制为后端真正支持的类型和布局，避免生成无法执行的 IR。
 def check_tensor(value, label):
     if not isinstance(value, torch.Tensor):
         raise ValueError(f"{label}: expected a Tensor")
@@ -35,6 +38,7 @@ def check_tensor(value, label):
 
 def analyze_exported(program):
     """Accept only (A, B) -> aten.matmul(A, B), with one tensor result."""
+    # 参数/常量状态也会出现在导出签名中；本实验只接受两个纯用户输入。
     signature = program.graph_signature
     if (len(signature.input_specs) != 2 or
             any(s.kind != InputKind.USER_INPUT for s in signature.input_specs) or
@@ -42,6 +46,7 @@ def analyze_exported(program):
             signature.output_specs[0].kind != OutputKind.USER_OUTPUT or
             program.state_dict or program.constants or program.range_constraints):
         raise ValueError("expected two user inputs, one output, no state or dynamic shapes")
+    # 检查图的结构和连接关系；不能只看到一个 matmul 名字就忽略额外计算。
     nodes = list(program.graph.nodes)
     if ([node.op for node in nodes] !=
             ["placeholder", "placeholder", "call_function", "output"]):
@@ -51,6 +56,7 @@ def analyze_exported(program):
             or product.args != (a, b) or product.kwargs
             or output.args != ((product,),)):
         raise ValueError("expected exactly A @ B in input order and its direct output")
+    # meta["val"] 提供形状/类型元数据（通常是 FakeTensor），不是要执行的实际数据。
     values = [node.meta.get("val") for node in (a, b, product)]
     for label, value in zip(("A", "B", "result"), values):
         check_tensor(value, label)
@@ -69,6 +75,7 @@ def export_model(model, a, b):
             raise ValueError(f"{label}: all values must be finite")
     if a.shape[1] != b.shape[0]:
         raise ValueError("A columns must equal B rows")
+    # 捕获真实 ATen 图；eval 设置推理模式，strict=True 使用严格导出路径。
     program = torch.export.export(model.eval(), (a, b), strict=True)
     return program, analyze_exported(program)
 
@@ -79,6 +86,7 @@ def emit_linalg(spec):
     The caller MUST initialize C to zero on every invocation. This contract
     replaces allocating/filling a tensor result; it is recorded in abi.json.
     """
+    # 这里直接拼出 Linalg-on-Buffers 文本，没有执行 Tensor IR -> MemRef 的 Bufferization。
     a = f"memref<{spec.m}x{spec.k}xf32>"
     b = f"memref<{spec.k}x{spec.n}xf32>"
     c = f"memref<{spec.m}x{spec.n}xf32>"

@@ -23,6 +23,7 @@
 | 顺序 | 图解教程 | 这一课结束后，你应该能做到 |
 | --- | --- | --- |
 | 0A | [终端、CMake 和第一个 C++ 程序](lab00-cmake-demo/TUTORIAL.md) | 区分源码、配置、编译和运行 |
+| 0A+ | [计算器测试工程](lab00-calculator-tests/TUTORIAL.md) | 解释 CMake、CTest、lit、FileCheck 如何配合，并亲手增加测试 |
 | 0B | [第一次读懂 MLIR 和 C++ 分析程序](lab00-cpp-analyzer/TUTORIAL.md) | 找到 Operation、Value、Type，统计加法 |
 | 1 | [手写加零优化 Pass](lab01-pattern-rewrite/TUTORIAL.md) | 解释匹配、替换和连续重写 |
 | 2 | [创建自己的 ToyDialect](lab02-toy-dialect/TUTORIAL.md) | 解释 .td 如何变成可注册的 C++ Operation |

@@ -3,7 +3,7 @@ set -euo pipefail
 root_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 llvm_prefix=${LLVM_PREFIX:-/usr/lib/llvm-20}
 jobs=${JOBS:-2}
-labs=(lab00-cmake-demo lab00-cpp-analyzer lab01-pattern-rewrite lab02-toy-dialect
+labs=(lab00-cmake-demo lab00-calculator-tests lab00-cpp-analyzer lab01-pattern-rewrite lab02-toy-dialect
       lab03-dialect-conversion lab04-compiler-pipeline lab05-mini-npu-compiler
       lab06-pytorch-to-npu)
 if (( $# > 0 )); then
@@ -11,13 +11,18 @@ if (( $# > 0 )); then
 fi
 for lab in "${labs[@]}"; do
   case "$lab" in
-    lab00-cmake-demo|lab00-cpp-analyzer|lab01-pattern-rewrite|lab02-toy-dialect|lab03-dialect-conversion|lab04-compiler-pipeline|lab05-mini-npu-compiler|lab06-pytorch-to-npu) ;;
+    lab00-cmake-demo|lab00-calculator-tests|lab00-cpp-analyzer|lab01-pattern-rewrite|lab02-toy-dialect|lab03-dialect-conversion|lab04-compiler-pipeline|lab05-mini-npu-compiler|lab06-pytorch-to-npu) ;;
     *) printf 'Unknown lab: %s\n' "$lab" >&2; exit 1 ;;
   esac
   printf '\nBuilding and testing %s\n' "$lab"
-  cmake -S "$root_dir/$lab" -B "$root_dir/$lab/build" -G Ninja \
-    -DMLIR_DIR="$llvm_prefix/lib/cmake/mlir" \
-    -DLLVM_DIR="$llvm_prefix/lib/cmake/llvm"
+  if [[ "$lab" == lab00-calculator-tests ]]; then
+    cmake -S "$root_dir/$lab" -B "$root_dir/$lab/build" -G Ninja \
+      -DLLVM_TOOLS_ROOT="$llvm_prefix"
+  else
+    cmake -S "$root_dir/$lab" -B "$root_dir/$lab/build" -G Ninja \
+      -DMLIR_DIR="$llvm_prefix/lib/cmake/mlir" \
+      -DLLVM_DIR="$llvm_prefix/lib/cmake/llvm"
+  fi
   cmake --build "$root_dir/$lab/build" -j "$jobs"
   case "$lab" in
     lab00-cmake-demo) "$root_dir/$lab/build/my_program" ;;

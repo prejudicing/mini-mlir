@@ -1,5 +1,7 @@
 # Lab0：普通 C++ 计算器的测试工程
 
+文件结构与职责：[PNG 图](diagrams/file-structure.png) · [可缩放 SVG](diagrams/file-structure.svg)。
+
 通过一个整数计算器，学习 CMake → CTest → lit → FileCheck。无需 MLIR 开发库；需要 C++17 编译器、CMake 3.20+、Ninja、Python3、lit 和 FileCheck。沿用现有 LLVM 20 环境即可，不需要额外 pip 安装。
 
 逐步学习见 [TUTORIAL.md](TUTORIAL.md)，其中[第 9 节逐条解释 CMake 语法与参数](TUTORIAL.md#9-cmakeliststxt-逐条语法讲解)。从项目根目录快速验证：

@@ -10,14 +10,17 @@ import sys
 from pathlib import Path
 
 
+# Python float 通常是双精度；通过打包/解包显式舍入成 FP32。
 def f32(value):
     return struct.unpack("f", struct.pack("f", value))[0]
 
 
+# Python 整数不会自然溢出；这里按模 2^32 实现有符号 INT32 回绕语义。
 def wrap_i32(value):
     return ((value + (1 << 31)) % (1 << 32)) - (1 << 31)
 
 
+# 功能模拟器入口：执行指令产生结果，不进行周期/吞吐预测，也不使用参考答案替换结果。
 def execute(program, inputs=None, seed=0):
     """Return kernel results; inputs is [A, B, C] or a name -> [A, B, C] map.
 
@@ -27,6 +30,7 @@ def execute(program, inputs=None, seed=0):
     rng = random.Random(seed)
     active = False
     results = []
+    # 用“字节地址 -> (元素值, 元素字节数)”字典抽象内存，不是每字节一项的原始数组。
     dram, sram, buffers = {}, {}, []
     peak, name, quant = 0, "", None
 
@@ -43,9 +47,11 @@ def execute(program, inputs=None, seed=0):
     for line in program.splitlines():
         if not line.strip():
             continue
+        # 文本解析使用空白切分和 key=value 切分，并非正则匹配或执行 Python 代码。
         parts = line.split()
         opcode = parts[0]
         fields = dict(item.split("=", 1) for item in parts[2 if opcode == "FUNC" else 1:])
+        # FUNC/BUFFER/QUANT/END 是程序描述与边界；LOAD/MATMUL/STORE 才执行主要操作。
         if opcode == "FUNC":
             assert not active
             active, name, peak, quant = True, parts[1], int(fields["sram"]), None
@@ -62,6 +68,7 @@ def execute(program, inputs=None, seed=0):
             dtype = fields.get("dtype", "f32")
             assert dtype in ("f32", "i8", "i32") and rows > 0 and cols > 0 and base % 64 == 0
             width = 1 if dtype == "i8" else 4
+            # 有实际宿主输入就使用它；否则生成可复现的测试值，不会从 IR 中获取张量数据。
             host = inputs[name] if isinstance(inputs, dict) else inputs
             if host is not None:
                 assert isinstance(inputs, dict) or not results, "pass a name map for multiple kernels"
@@ -95,6 +102,7 @@ def execute(program, inputs=None, seed=0):
             width = p.get("bytes", 4)
             for row in range(p["rows"]):
                 for col in range(p["cols"]):
+                    # 全局矩阵按完整行跨度访问；SRAM tile 按块宽度连续存储。
                     g = p["g"] + (row * p["stride"] + col) * width
                     s = local(p["s"] + (row * p["cols"] + col) * width, width)
                     assert g in dram and dram[g][1] == width, "DRAM access/element width mismatch"
@@ -102,6 +110,7 @@ def execute(program, inputs=None, seed=0):
                         sram[s] = dram[g]
                     else:
                         dram[g] = (read_sram(s, width), width)
+        # 执行 C_tile += A_tile*B_tile；不能在此清零 C，否则会丢失初值及前面 K 块的部分和。
         elif opcode in ("MATMUL", "MATMUL_I8"):
             assert active and len(buffers) == 3
             p = {key: int(value) for key, value in fields.items()}
@@ -115,6 +124,7 @@ def execute(program, inputs=None, seed=0):
                     for red in range(k):
                         a = read_sram(p["a"] + (row * k + red) * width, width)
                         b = read_sram(p["b"] + (red * n + col) * width, width)
+                        # INT8 路径做整数回绕；FP32 路径分别舍入乘法与加法，不模拟 FMA。
                         value = wrap_i32(value + a * b) if width == 1 else f32(value + f32(a * b))
                     sram[c] = (value, 4)
         elif opcode == "END":
@@ -132,6 +142,8 @@ def execute(program, inputs=None, seed=0):
     return results
 
 
+# 测试包装层：execute 产生设备结果，下面从原始矩阵独立计算参考并比较。
+# repeats 是参考模型的重复累加次数，调用 execute 仍只执行传入程序一次。
 def simulate(program, seed=0, repeats=1, inputs=None):
     reports = []
     for result in execute(program, inputs, seed):

@@ -14,6 +14,8 @@
 
 using namespace mlir;
 namespace {
+// 本实验的 kernel ABI：单基本块、三个 A/B/C buffer 参数、无 SSA 返回值。
+// 输出通过写入 C 的内存传回，不是通过 func.return 返回新 Tensor。
 LogicalResult verifyFunction(func::FuncOp func) {
   if (func.isExternal() || func.getNumResults() || !llvm::hasSingleElement(func.getBody()) ||
       func.getNumArguments() != 3)
@@ -23,6 +25,7 @@ LogicalResult verifyFunction(func::FuncOp func) {
   return npu::verifyQuantization(func);
 }
 
+// 局部转换规则只处理一个 linalg.matmul；全局合法性由 LowerPass 保证。
 struct LowerMatmul : OpConversionPattern<linalg::MatmulOp> {
   using OpConversionPattern::OpConversionPattern;
   LogicalResult matchAndRewrite(linalg::MatmulOp op, OpAdaptor adaptor,
@@ -35,16 +38,19 @@ struct LowerMatmul : OpConversionPattern<linalg::MatmulOp> {
     auto maps = op.getIndexingMapsArray();
     MLIRContext *ctx = op.getContext();
     auto d0 = getAffineDimExpr(0, ctx), d1 = getAffineDimExpr(1, ctx), d2 = getAffineDimExpr(2, ctx);
+    // d0=M、d1=N、d2=K；三张映射依次访问 A[M,K]、B[K,N]、C[M,N]。
     SmallVector<AffineMap> expected = {
       AffineMap::get(3, 0, {d0, d2}, ctx), AffineMap::get(3, 0, {d2, d1}, ctx),
       AffineMap::get(3, 0, {d0, d1}, ctx)};
     if (maps != expected)
       return rewriter.notifyMatchFailure(op, "only standard matmul indexing maps are supported");
+    // adaptor 提供转换驱动器重映射后的操作数，避免继续引用过时的输入值。
     Value a = adaptor.getInputs()[0], b = adaptor.getInputs()[1], c = adaptor.getOutputs()[0];
     auto func = op->getParentOfType<func::FuncOp>();
     if (!func || a != func.getArgument(0) || b != func.getArgument(1) || c != func.getArgument(2))
       return rewriter.notifyMatchFailure(op, "buffers must follow the kernel A, B, C argument order");
     if (failed(npu::verifyMatrices(op, a, b, c))) return failure();
+    // 两边都是 C += A*B 的 buffer 操作，不产生 SSA 结果；只替换操作本身。
     rewriter.replaceOpWithNewOp<npu::MatmulOp>(op, a, b, c);
     return success();
   }
@@ -54,6 +60,7 @@ struct LowerPass : PassWrapper<LowerPass, OperationPass<ModuleOp>> {
   MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(LowerPass)
   StringRef getArgument() const final { return "convert-linalg-to-npu"; }
   StringRef getDescription() const final { return "Lower buffer matmul to NPU"; }
+  // 声明本 Pass 将创建的方言，使其在运行 Pass 前可用。
   void getDependentDialects(DialectRegistry &registry) const override {
     registry.insert<npu::NPUDialect>();
   }
@@ -62,6 +69,7 @@ struct LowerPass : PassWrapper<LowerPass, OperationPass<ModuleOp>> {
       if (failed(verifyFunction(func))) return signalPassFailure();
     RewritePatternSet patterns(&getContext());
     patterns.add<LowerMatmul>(&getContext());
+    // Full Conversion 要求所有操作最终满足合法性目标，不能留下未转换的 Linalg。
     ConversionTarget target(getContext());
     target.addLegalOp<ModuleOp>();
     target.addLegalDialect<func::FuncDialect, npu::NPUDialect>();
@@ -108,6 +116,8 @@ struct QuantizePass : PassWrapper<QuantizePass, OperationPass<ModuleOp>> {
           }
       }
     }
+    // 类型修改会同时影响引用这些 BlockArgument 的 npu.matmul 操作数。
+    // 函数入口参数类型和函数签名也必须同步更新，二者要保持一致。
     Builder builder(&getContext());
     for (auto func : getOperation().getOps<func::FuncOp>()) {
       SmallVector<Type> inputs;
@@ -131,6 +141,7 @@ struct QuantizePass : PassWrapper<QuantizePass, OperationPass<ModuleOp>> {
   }
 };
 
+// 在编译时展开 M/N/K 三重循环；输出是多条 npu.tile，不是运行时循环。
 struct TilePass : PassWrapper<TilePass, OperationPass<ModuleOp>> {
   MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(TilePass)
   TilePass() = default;
@@ -144,6 +155,7 @@ struct TilePass : PassWrapper<TilePass, OperationPass<ModuleOp>> {
       getOperation().emitError("tile-size must be in [1, 64]");
       return signalPassFailure();
     }
+    // 先收集再修改，避免在遍历 IR 的同时删除当前操作而影响遍历。
     SmallVector<npu::MatmulOp> matmuls;
     getOperation().walk([&](npu::MatmulOp op) { matmuls.push_back(op); });
     IRRewriter rewriter(&getContext());
@@ -151,11 +163,14 @@ struct TilePass : PassWrapper<TilePass, OperationPass<ModuleOp>> {
       auto at = cast<MemRefType>(op.getA().getType());
       auto ct = cast<MemRefType>(op.getC().getType());
       int64_t M = ct.getDimSize(0), N = ct.getDimSize(1), K = at.getDimSize(1);
+      // ceil(M/tile)*ceil(N/tile)*ceil(K/tile) 是展开后的 tile 数量。
       if (((M + tileSize - 1) / tileSize) * ((N + tileSize - 1) / tileSize) *
           ((K + tileSize - 1) / tileSize) > 100000) {
         op.emitError("tiling would exceed 100000 instructions; use larger tiles");
         return signalPassFailure();
       }
+      // 新 tile 插在旧 matmul 前，保持多个矩阵运算之间的程序顺序。
+      // min(tileSize, 剩余维度) 处理不能整除的边界；K 方向必须累加同一 C 块。
       rewriter.setInsertionPoint(op);
       for (int64_t m = 0; m < M; m += tileSize)
         for (int64_t n = 0; n < N; n += tileSize)
@@ -170,6 +185,7 @@ struct TilePass : PassWrapper<TilePass, OperationPass<ModuleOp>> {
   }
 };
 
+// 只规划地址与容量，不在编译器中申请设备内存，也不执行数据搬运。
 struct PlanPass : PassWrapper<PlanPass, OperationPass<ModuleOp>> {
   MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(PlanPass)
   PlanPass() = default;
@@ -186,9 +202,11 @@ struct PlanPass : PassWrapper<PlanPass, OperationPass<ModuleOp>> {
     Builder builder(&getContext());
     for (auto func : getOperation().getOps<func::FuncOp>()) {
       if (failed(verifyFunction(func))) return signalPassFailure();
+      // DRAM 为三个完整矩阵依次保留空间；SRAM 只保存当前 tile 的临时数据。
       int64_t address = 0, peak = 0;
       for (auto [index, arg] : llvm::enumerate(func.getArguments())) {
         auto type = cast<MemRefType>(arg.getType());
+        // 每个元素的字节数随 FP32/INT8/INT32 改变，不能统一写死为 4。
         int64_t bytes = type.getNumElements() * npu::elementBytes(type);
         func.setArgAttr(index, "npu.address", builder.getI64IntegerAttr(address));
         func.setArgAttr(index, "npu.bytes", builder.getI64IntegerAttr(bytes));
@@ -215,6 +233,8 @@ struct PlanPass : PassWrapper<PlanPass, OperationPass<ModuleOp>> {
         int64_t ab = npu::elementBytes(cast<MemRefType>(op.getA().getType()));
         int64_t bb = npu::elementBytes(cast<MemRefType>(op.getB().getType()));
         int64_t cb = npu::elementBytes(cast<MemRefType>(op.getC().getType()));
+        // SRAM 排布：A 从 0 开始；B 跟在对齐后的 A 后；C 跟在对齐后的 B 后。
+        // 对齐的是保留空间，实际搬运仍只处理 tile 的有效元素。
         int64_t b = npu::align64(tm * tk * ab);
         int64_t c = b + npu::align64(tk * tn * bb);
         int64_t required = c + npu::align64(tm * tn * cb);
@@ -243,6 +263,8 @@ struct PipelineOptions : PassPipelineOptions<PipelineOptions> {
 };
 } // namespace
 
+// 单独注册 Pass 便于观察每阶段；npu-compile 则按固定顺序组装完整流水线。
+// 量化必须在分块/地址规划之前，因为元素宽度变化会改变内存需求。
 void mlir::npu::registerNPUPasses() {
   PassRegistration<LowerPass>();
   PassRegistration<QuantizePass>();

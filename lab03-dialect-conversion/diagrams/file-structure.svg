@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="872" viewBox="0 0 1900 872" role="img" aria-labelledby="title desc">
+<title id="title">Lab03 · Toy → Arith：文件结构与职责</title>
+<desc id="desc">文件树左侧展示源码路径，右侧说明用途；不介绍 Markdown/HTML 文档，不展开 build 生成目录和图片资源。</desc>
+<rect width="1900" height="872" fill="#f5f8fd"/>
+<style>text {font-family:"Noto Sans SC","Microsoft YaHei",sans-serif;} .tree {font-family:"DejaVu Sans Mono","Noto Sans SC",monospace;white-space:pre;}</style>
+<text x="48" y="58" font-size="32" font-weight="700" fill="#0f172a">Lab03 · Toy → Arith · 文件结构与职责</text>
+<text x="48" y="100" font-size="20" fill="#475569">只介绍程序、配置、测试与输入数据；省略 Markdown/HTML 文档、build 生成产物及图片明细。</text>
+<text x="48" y="155" font-size="22" font-weight="700" fill="#334155">文件结构</text>
+<text x="770" y="155" font-size="22" font-weight="700" fill="#334155">用途 / 在实验中的职责</text>
+<rect x="32" y="179" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="208" font-size="21" fill="#1d4ed8" font-weight="700">lab03-dialect-conversion/</text>
+<text x="770" y="208" font-size="21" fill="#334155">实验源码根目录</text>
+<text class="tree" xml:space="preserve" x="48" y="250" font-size="21" fill="#1d4ed8" font-weight="700">├── diagrams/</text>
+<text x="770" y="250" font-size="21" fill="#334155">流程图与本文件结构图（不展开图片）</text>
+<rect x="32" y="263" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="292" font-size="21" fill="#1d4ed8" font-weight="700">├── include/</text>
+<text x="770" y="292" font-size="21" fill="#334155">公开 C++ / TableGen 定义</text>
+<text class="tree" xml:space="preserve" x="48" y="334" font-size="21" fill="#0f172a" font-weight="400">│   └── ToyConversion.h</text>
+<text x="770" y="334" font-size="21" fill="#334155">声明转换 Pass 创建函数与注册函数</text>
+<rect x="32" y="347" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="376" font-size="21" fill="#1d4ed8" font-weight="700">├── lib/</text>
+<text x="770" y="376" font-size="21" fill="#334155">方言、Pass 或代码生成实现</text>
+<text class="tree" xml:space="preserve" x="48" y="418" font-size="21" fill="#0f172a" font-weight="400">│   └── ConvertToyToArith.cpp</text>
+<text x="770" y="418" font-size="21" fill="#334155">定义 ConversionPattern、类型映射与 Full Conversion</text>
+<rect x="32" y="431" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="460" font-size="21" fill="#1d4ed8" font-weight="700">├── tests/</text>
+<text x="770" y="460" font-size="21" fill="#334155">自动化测试与测试配置</text>
+<text class="tree" xml:space="preserve" x="48" y="502" font-size="21" fill="#0f172a" font-weight="400">│   ├── convert.mlir</text>
+<text x="770" y="502" font-size="21" fill="#334155">检查 Toy 常量、加法转换为 Arith 后的数据依赖</text>
+<rect x="32" y="515" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="544" font-size="21" fill="#0f172a" font-weight="400">│   ├── illegal.mlir</text>
+<text x="770" y="544" font-size="21" fill="#334155">检查非法操作无法完成 Full Conversion 的失败诊断</text>
+<text class="tree" xml:space="preserve" x="48" y="586" font-size="21" fill="#0f172a" font-weight="400">│   ├── lit.cfg.py</text>
+<text x="770" y="586" font-size="21" fill="#334155">设置 lit 的测试发现、Shell 格式及命令替换规则</text>
+<rect x="32" y="599" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="628" font-size="21" fill="#0f172a" font-weight="400">│   └── lit.site.cfg.py.in</text>
+<text x="770" y="628" font-size="21" fill="#334155">由 CMake 填入工具路径，生成 build 中的 lit 配置</text>
+<text class="tree" xml:space="preserve" x="48" y="670" font-size="21" fill="#1d4ed8" font-weight="700">├── tools/</text>
+<text x="770" y="670" font-size="21" fill="#334155">命令行可执行工具入口</text>
+<rect x="32" y="683" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="712" font-size="21" fill="#0f172a" font-weight="400">│   └── toy-convert-opt.cpp</text>
+<text x="770" y="712" font-size="21" fill="#334155">注册 Toy/Arith/Func 方言及转换 Pass，启动 opt 驱动</text>
+<text class="tree" xml:space="preserve" x="48" y="754" font-size="21" fill="#0f172a" font-weight="400">└── CMakeLists.txt</text>
+<text x="770" y="754" font-size="21" fill="#334155">配置构建目标、链接依赖及测试入口</text>
+<text x="48" y="844" font-size="18" fill="#64748b">按实际源码目录生成 · 重新生成：python3 scripts/render-lab-file-trees.py --png（PNG 需要 CairoSVG 与中文字体）</text>
+</svg>

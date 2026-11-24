@@ -7,6 +7,7 @@
 | 编号 | 目录 | 学习内容与教程 |
 | --- | --- | --- |
 | Lab00 | `lab00-cmake-demo` | [图解：终端、CMake 与第一个程序](lab00-cmake-demo/TUTORIAL.md) |
+| Lab00 | `lab00-calculator-tests` | [普通 C++ 计算器：CMake、CTest、lit、FileCheck](lab00-calculator-tests/TUTORIAL.md) |
 | Lab00 | `lab00-cpp-analyzer` | [图解：MLIR C++ API、IR 遍历和分析](lab00-cpp-analyzer/TUTORIAL.md) |
 | Lab01 | `lab01-pattern-rewrite` | [图解：加零优化、Pass、Pattern、Greedy Rewrite](lab01-pattern-rewrite/TUTORIAL.md) |
 | Lab02 | `lab02-toy-dialect` | [图解：TableGen、ToyDialect、注册与 Verifier](lab02-toy-dialect/TUTORIAL.md) |

@@ -1,5 +1,7 @@
 # Lab5：Mini NPU Compiler
 
+文件结构与职责：[PNG 图](diagrams/file-structure.png) · [可缩放 SVG](diagrams/file-structure.svg)。
+
 零基础学习请先看 [图解教程：从矩阵到 NPU，再到 INT8](TUTORIAL.md)，本文保留实现与运行参考。
 
 这是可以完整运行的教学编译器：输入 Linalg buffer matmul，输出自定义 NPU 伪指令，并用指令模拟器核对数值。代码、样例、错误案例与自动测试均已实现。

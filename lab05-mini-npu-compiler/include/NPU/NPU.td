@@ -7,6 +7,7 @@ def NPU_Dialect : Dialect {
   let cppNamespace = "::mlir::npu";
   let summary = "A teaching NPU with explicit DRAM and tile SRAM";
 }
+// 提取方言公共信息，派生定义的名字会形成 npu.matmul、npu.tile。
 class NPU_Op<string name> : Op<NPU_Dialect, name>;
 
 // Buffer 写操作不声明 Pure：结果通过 C 的内存变化体现。
@@ -14,9 +15,11 @@ def NPU_MatmulOp : NPU_Op<"matmul"> {
   let summary = "Accumulate C += A * B for f32 or signed i8/i8/i32 matrices";
   let arguments = (ins AnyMemRef:$a, AnyMemRef:$b, AnyMemRef:$c);
   let assemblyFormat = "$a `,` $b `,` $c attr-dict `:` type($a) `,` type($b) `,` type($c)";
+  // 声明需要手写 verify()，具体实现位于 lib/NPUDialect.cpp。
   let hasVerifier = 1;
 }
 
+// 仍引用完整 A/B/C buffer，m/n/k 是块起点，tm/tn/tk 是有效块尺寸。
 def NPU_TileOp : NPU_Op<"tile"> {
   let summary = "Accumulate a bounded M/N/K tile into C";
   let arguments = (ins AnyMemRef:$a, AnyMemRef:$b, AnyMemRef:$c,

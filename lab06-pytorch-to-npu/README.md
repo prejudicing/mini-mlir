@@ -1,5 +1,7 @@
 # Lab6：从 PyTorch 矩阵乘法到 Mini NPU
 
+文件结构与职责：[PNG 图](diagrams/file-structure.png) · [可缩放 SVG](diagrams/file-structure.svg)。
+
 面向零基础的逐步讲解见 [图解教程](TUTORIAL.md)。本实验承接 [Lab5](../lab05-mini-npu-compiler/README.md)，完整接入真实的 PyTorch `A @ B` 模型，同时保留 FP32 和 INT8 两条路径。
 
 ![完整编译和执行流程](docs/images/pipeline.png)

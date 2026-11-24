@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="788" viewBox="0 0 1900 788" role="img" aria-labelledby="title desc">
+<title id="title">Lab00 · 计算器与测试工程：文件结构与职责</title>
+<desc id="desc">文件树左侧展示源码路径，右侧说明用途；不介绍 Markdown/HTML 文档，不展开 build 生成目录和图片资源。</desc>
+<rect width="1900" height="788" fill="#f5f8fd"/>
+<style>text {font-family:"Noto Sans SC","Microsoft YaHei",sans-serif;} .tree {font-family:"DejaVu Sans Mono","Noto Sans SC",monospace;white-space:pre;}</style>
+<text x="48" y="58" font-size="32" font-weight="700" fill="#0f172a">Lab00 · 计算器与测试工程 · 文件结构与职责</text>
+<text x="48" y="100" font-size="20" fill="#475569">只介绍程序、配置、测试与输入数据；省略 Markdown/HTML 文档、build 生成产物及图片明细。</text>
+<text x="48" y="155" font-size="22" font-weight="700" fill="#334155">文件结构</text>
+<text x="770" y="155" font-size="22" font-weight="700" fill="#334155">用途 / 在实验中的职责</text>
+<rect x="32" y="179" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="208" font-size="21" fill="#1d4ed8" font-weight="700">lab00-calculator-tests/</text>
+<text x="770" y="208" font-size="21" fill="#334155">实验源码根目录</text>
+<text class="tree" xml:space="preserve" x="48" y="250" font-size="21" fill="#1d4ed8" font-weight="700">├── diagrams/</text>
+<text x="770" y="250" font-size="21" fill="#334155">流程图与本文件结构图（不展开图片）</text>
+<rect x="32" y="263" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="292" font-size="21" fill="#1d4ed8" font-weight="700">├── tests/</text>
+<text x="770" y="292" font-size="21" fill="#334155">自动化测试与测试配置</text>
+<text class="tree" xml:space="preserve" x="48" y="334" font-size="21" fill="#0f172a" font-weight="400">│   ├── arithmetic.test</text>
+<text x="770" y="334" font-size="21" fill="#334155">四则运算：RUN 执行命令，FileCheck 检查输出</text>
+<rect x="32" y="347" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="376" font-size="21" fill="#0f172a" font-weight="400">│   ├── boundaries.test</text>
+<text x="770" y="376" font-size="21" fill="#334155">检查负数、零、大整数和整数除法边界</text>
+<text class="tree" xml:space="preserve" x="48" y="418" font-size="21" fill="#0f172a" font-weight="400">│   ├── check_error.py</text>
+<text x="770" y="418" font-size="21" fill="#334155">检查退出码为 2 且 stdout 为空，转发诊断文本</text>
+<rect x="32" y="431" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="460" font-size="21" fill="#0f172a" font-weight="400">│   ├── errors.test</text>
+<text x="770" y="460" font-size="21" fill="#334155">检查除零、未知操作及非法输入的错误信息</text>
+<text class="tree" xml:space="preserve" x="48" y="502" font-size="21" fill="#0f172a" font-weight="400">│   ├── lit.cfg.py</text>
+<text x="770" y="502" font-size="21" fill="#334155">设置 lit 的测试发现、Shell 格式及命令替换规则</text>
+<rect x="32" y="515" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="544" font-size="21" fill="#0f172a" font-weight="400">│   ├── lit.site.cfg.py.in</text>
+<text x="770" y="544" font-size="21" fill="#334155">由 CMake 填入工具路径，生成 build 中的 lit 配置</text>
+<text class="tree" xml:space="preserve" x="48" y="586" font-size="21" fill="#0f172a" font-weight="400">│   └── usage.test</text>
+<text x="770" y="586" font-size="21" fill="#334155">检查参数数量错误时的用法提示</text>
+<rect x="32" y="599" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="628" font-size="21" fill="#0f172a" font-weight="400">├── CMakeLists.txt</text>
+<text x="770" y="628" font-size="21" fill="#334155">配置构建目标、链接依赖及测试入口</text>
+<text class="tree" xml:space="preserve" x="48" y="670" font-size="21" fill="#0f172a" font-weight="400">└── main.cpp</text>
+<text x="770" y="670" font-size="21" fill="#334155">整数计算器：加减乘除、参数检查及错误退出码</text>
+<text x="48" y="760" font-size="18" fill="#64748b">按实际源码目录生成 · 重新生成：python3 scripts/render-lab-file-trees.py --png（PNG 需要 CairoSVG 与中文字体）</text>
+</svg>

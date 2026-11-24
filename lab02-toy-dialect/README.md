@@ -1,5 +1,7 @@
 # Lab2：创建自定义 ToyDialect
 
+文件结构与职责：[PNG 图](diagrams/file-structure.png) · [可缩放 SVG](diagrams/file-structure.svg)。
+
 零基础学习请先看 [图解教程](TUTORIAL.md)，本文保留较详细的实现与运行参考。
 
 本实验已经提供完整实现。学习时先运行，再按下面步骤阅读和修改；不需要先自行补齐代码。

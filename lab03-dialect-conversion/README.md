@@ -1,5 +1,7 @@
 # Lab3：Dialect Conversion
 
+文件结构与职责：[PNG 图](diagrams/file-structure.png) · [可缩放 SVG](diagrams/file-structure.svg)。
+
 零基础学习请先看 [图解教程](TUTORIAL.md)，本文保留实现与运行参考。
 
 本实验已实现完整转换 Pass，并复用 Lab2 的 ToyDialect 库。目标是把所有 `toy.constant`、`toy.add` 转成 Arith Operation，同时保持数据依赖与 i32/i64 类型。

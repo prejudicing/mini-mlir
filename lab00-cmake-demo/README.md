@@ -1,5 +1,7 @@
 # Lab00：CMake 环境准备
 
+文件结构与职责：[PNG 图](diagrams/file-structure.png) · [可缩放 SVG](diagrams/file-structure.svg)。
+
 零基础学习请先看 [图解教程](TUTORIAL.md)，本文保留简要运行说明。
 
 保留最初的 CMake 示例，目录由 `cmake-demo` 改为 `lab00-cmake-demo`。

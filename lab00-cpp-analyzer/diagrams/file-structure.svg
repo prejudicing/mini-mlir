@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="494" viewBox="0 0 1900 494" role="img" aria-labelledby="title desc">
+<title id="title">Lab00 · MLIR C++ 分析器：文件结构与职责</title>
+<desc id="desc">文件树左侧展示源码路径，右侧说明用途；不介绍 Markdown/HTML 文档，不展开 build 生成目录和图片资源。</desc>
+<rect width="1900" height="494" fill="#f5f8fd"/>
+<style>text {font-family:"Noto Sans SC","Microsoft YaHei",sans-serif;} .tree {font-family:"DejaVu Sans Mono","Noto Sans SC",monospace;white-space:pre;}</style>
+<text x="48" y="58" font-size="32" font-weight="700" fill="#0f172a">Lab00 · MLIR C++ 分析器 · 文件结构与职责</text>
+<text x="48" y="100" font-size="20" fill="#475569">只介绍程序、配置、测试与输入数据；省略 Markdown/HTML 文档、build 生成产物及图片明细。</text>
+<text x="48" y="155" font-size="22" font-weight="700" fill="#334155">文件结构</text>
+<text x="770" y="155" font-size="22" font-weight="700" fill="#334155">用途 / 在实验中的职责</text>
+<rect x="32" y="179" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="208" font-size="21" fill="#1d4ed8" font-weight="700">lab00-cpp-analyzer/</text>
+<text x="770" y="208" font-size="21" fill="#334155">实验源码根目录</text>
+<text class="tree" xml:space="preserve" x="48" y="250" font-size="21" fill="#1d4ed8" font-weight="700">├── diagrams/</text>
+<text x="770" y="250" font-size="21" fill="#334155">流程图与本文件结构图（不展开图片）</text>
+<rect x="32" y="263" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="292" font-size="21" fill="#0f172a" font-weight="400">├── CMakeLists.txt</text>
+<text x="770" y="292" font-size="21" fill="#334155">查找 MLIR，设置 C++17、头文件路径与分析器链接库</text>
+<text class="tree" xml:space="preserve" x="48" y="334" font-size="21" fill="#0f172a" font-weight="400">├── main.cpp</text>
+<text x="770" y="334" font-size="21" fill="#334155">解析 MLIR，运行分析 Pass，遍历并统计 arith.addi</text>
+<rect x="32" y="347" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="376" font-size="21" fill="#0f172a" font-weight="400">└── test.mlir</text>
+<text x="770" y="376" font-size="21" fill="#334155">分析器输入：包含整数常量、加法与函数</text>
+<text x="48" y="466" font-size="18" fill="#64748b">按实际源码目录生成 · 重新生成：python3 scripts/render-lab-file-trees.py --png（PNG 需要 CairoSVG 与中文字体）</text>
+</svg>

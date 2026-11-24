@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1124" viewBox="0 0 1900 1124" role="img" aria-labelledby="title desc">
+<title id="title">Lab02 · 自定义 Toy 方言：文件结构与职责</title>
+<desc id="desc">文件树左侧展示源码路径，右侧说明用途；不介绍 Markdown/HTML 文档，不展开 build 生成目录和图片资源。</desc>
+<rect width="1900" height="1124" fill="#f5f8fd"/>
+<style>text {font-family:"Noto Sans SC","Microsoft YaHei",sans-serif;} .tree {font-family:"DejaVu Sans Mono","Noto Sans SC",monospace;white-space:pre;}</style>
+<text x="48" y="58" font-size="32" font-weight="700" fill="#0f172a">Lab02 · 自定义 Toy 方言 · 文件结构与职责</text>
+<text x="48" y="100" font-size="20" fill="#475569">只介绍程序、配置、测试与输入数据；省略 Markdown/HTML 文档、build 生成产物及图片明细。</text>
+<text x="48" y="155" font-size="22" font-weight="700" fill="#334155">文件结构</text>
+<text x="770" y="155" font-size="22" font-weight="700" fill="#334155">用途 / 在实验中的职责</text>
+<rect x="32" y="179" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="208" font-size="21" fill="#1d4ed8" font-weight="700">lab02-toy-dialect/</text>
+<text x="770" y="208" font-size="21" fill="#334155">实验源码根目录</text>
+<text class="tree" xml:space="preserve" x="48" y="250" font-size="21" fill="#1d4ed8" font-weight="700">├── diagrams/</text>
+<text x="770" y="250" font-size="21" fill="#334155">流程图与本文件结构图（不展开图片）</text>
+<rect x="32" y="263" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="292" font-size="21" fill="#1d4ed8" font-weight="700">├── include/</text>
+<text x="770" y="292" font-size="21" fill="#334155">公开 C++ / TableGen 定义</text>
+<text class="tree" xml:space="preserve" x="48" y="334" font-size="21" fill="#1d4ed8" font-weight="700">│   └── Toy/</text>
+<text x="770" y="334" font-size="21" fill="#334155">Toy 方言与操作接口</text>
+<rect x="32" y="347" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="376" font-size="21" fill="#0f172a" font-weight="400">│       ├── ToyDialect.h</text>
+<text x="770" y="376" font-size="21" fill="#334155">方言公开声明：包含 TableGen 生成的方言头文件</text>
+<text class="tree" xml:space="preserve" x="48" y="418" font-size="21" fill="#0f172a" font-weight="400">│       ├── ToyDialect.td</text>
+<text x="770" y="418" font-size="21" fill="#334155">TableGen 方言定义：名称、C++ 命名空间等</text>
+<rect x="32" y="431" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="460" font-size="21" fill="#0f172a" font-weight="400">│       ├── ToyOps.h</text>
+<text x="770" y="460" font-size="21" fill="#334155">操作公开声明：包含生成的 Op 类及所需接口</text>
+<text class="tree" xml:space="preserve" x="48" y="502" font-size="21" fill="#0f172a" font-weight="400">│       └── ToyOps.td</text>
+<text x="770" y="502" font-size="21" fill="#334155">定义 constant/add/mul 的约束、文本格式和 Verifier 声明</text>
+<rect x="32" y="515" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="544" font-size="21" fill="#1d4ed8" font-weight="700">├── lib/</text>
+<text x="770" y="544" font-size="21" fill="#334155">方言、Pass 或代码生成实现</text>
+<text class="tree" xml:space="preserve" x="48" y="586" font-size="21" fill="#0f172a" font-weight="400">│   ├── ToyDialect.cpp</text>
+<text x="770" y="586" font-size="21" fill="#334155">实现 initialize，将生成的操作类型注册进方言</text>
+<rect x="32" y="599" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="628" font-size="21" fill="#0f172a" font-weight="400">│   └── ToyOps.cpp</text>
+<text x="770" y="628" font-size="21" fill="#334155">包含生成的操作实现，手写常量和整数位宽验证</text>
+<text class="tree" xml:space="preserve" x="48" y="670" font-size="21" fill="#1d4ed8" font-weight="700">├── tests/</text>
+<text x="770" y="670" font-size="21" fill="#334155">自动化测试与测试配置</text>
+<rect x="32" y="683" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="712" font-size="21" fill="#0f172a" font-weight="400">│   ├── invalid.mlir</text>
+<text x="770" y="712" font-size="21" fill="#334155">非法输入：配合 expected-error 检查诊断</text>
+<text class="tree" xml:space="preserve" x="48" y="754" font-size="21" fill="#0f172a" font-weight="400">│   ├── run.py</text>
+<text x="770" y="754" font-size="21" fill="#334155">组织 FileCheck、解析打印往返、Verifier 与 builder 测试</text>
+<rect x="32" y="767" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="796" font-size="21" fill="#0f172a" font-weight="400">│   └── valid.mlir</text>
+<text x="770" y="796" font-size="21" fill="#334155">合法输入：覆盖常量、加法、乘法及不同整数位宽</text>
+<text class="tree" xml:space="preserve" x="48" y="838" font-size="21" fill="#1d4ed8" font-weight="700">├── tools/</text>
+<text x="770" y="838" font-size="21" fill="#334155">命令行可执行工具入口</text>
+<rect x="32" y="851" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="880" font-size="21" fill="#0f172a" font-weight="400">│   ├── toy-build.cpp</text>
+<text x="770" y="880" font-size="21" fill="#334155">通过 C++ OpBuilder 创建并验证 Toy IR，然后打印</text>
+<text class="tree" xml:space="preserve" x="48" y="922" font-size="21" fill="#0f172a" font-weight="400">│   └── toy-opt.cpp</text>
+<text x="770" y="922" font-size="21" fill="#334155">注册方言，调用 MlirOptMain 提供解析、验证、打印入口</text>
+<rect x="32" y="935" width="1836" height="42" rx="5" fill="#eaf0f8"/>
+<text class="tree" xml:space="preserve" x="48" y="964" font-size="21" fill="#0f172a" font-weight="400">├── CMakeLists.txt</text>
+<text x="770" y="964" font-size="21" fill="#334155">配置构建目标、链接依赖及测试入口</text>
+<text class="tree" xml:space="preserve" x="48" y="1006" font-size="21" fill="#0f172a" font-weight="400">└── test.mlir</text>
+<text x="770" y="1006" font-size="21" fill="#334155">基础 Toy IR 示例及输出检查规则</text>
+<text x="48" y="1096" font-size="18" fill="#64748b">按实际源码目录生成 · 重新生成：python3 scripts/render-lab-file-trees.py --png（PNG 需要 CairoSVG 与中文字体）</text>
+</svg>

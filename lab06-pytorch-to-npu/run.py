@@ -15,6 +15,7 @@ LAB_DIR = Path(__file__).resolve().parent
 BACKEND_DIR = LAB_DIR.parent / "lab05-mini-npu-compiler"
 
 
+# 按文件路径复用 Lab5 的执行模型和量化函数；不复制、也不重新实现后端。
 def load_backend_module(name):
     spec = importlib.util.spec_from_file_location(f"lab5_{name}", BACKEND_DIR / f"{name}.py")
     module = importlib.util.module_from_spec(spec)
@@ -26,6 +27,8 @@ simulator = load_backend_module("simulator")
 quantize = load_backend_module("quantize")
 
 
+# source 从标准输入传入编译工具，返回值是工具标准输出中的 IR 或伪指令。
+# stderr 留给诊断，非零退出码立即中止，避免把错误信息当作下一阶段输入。
 def run_tool(arguments, source):
     completed = subprocess.run([str(arg) for arg in arguments], input=source,
                                text=True, capture_output=True)
@@ -34,6 +37,7 @@ def run_tool(arguments, source):
     return completed.stdout
 
 
+# 使用局部随机数生成器，固定 seed 后可复现实验输入。
 def make_inputs(m=5, n=6, k=7, seed=42):
     if any(type(dim) is not int or not 1 <= dim <= 4096 for dim in (m, n, k)):
         raise ValueError("M/N/K must be integers in [1, 4096]")
@@ -58,7 +62,9 @@ def compile_and_run(a, b, backend_dir, output_dir, *, mode="fp32", tile_size=4,
         raise ValueError("Lab5 tools not found; build the backend first")
 
     model = MatmulModel() if model is None else model
+    # 阶段 1：导出并验证图，同时获取后端需要的静态矩阵尺寸。
     program, spec = export_model(model, a, b)
+    # PyTorch 只产生独立参考答案；后面的 actual 必须来自模拟器执行。
     # The model executes only to provide a reference, not the NPU result.
     with torch.no_grad():
         reference = model(a, b).detach()
@@ -69,15 +75,19 @@ def compile_and_run(a, b, backend_dir, output_dir, *, mode="fp32", tile_size=4,
     (output_dir / "exported_graph.txt").write_text(str(program.graph_module.graph) + "\n")
     (output_dir / "abi.json").write_text(json.dumps(spec.manifest(), indent=2) + "\n")
 
+    # 阶段 2：生成 buffer 形式 Linalg，再调用实际 C++ Pass 转成 npu.matmul。
     source = emit_linalg(spec)
     (output_dir / "01-linalg.mlir").write_text(source)
     lowered = run_tool([opt, "--convert-linalg-to-npu", "--verify-each"], source)
     (output_dir / "02-npu.mlir").write_text(lowered)
+    # 指令流与数据流分开：IR 描述计算与类型/形状，这些列表才是设备实际读取的数值。
     av, bv = a.detach().flatten().tolist(), b.detach().flatten().tolist()
+    # 后端执行 C += A*B；此处清零 C 才能实现 PyTorch 的 C = A@B。
     # Lab5 implements accumulation; a fresh zeroed C implements torch.matmul.
     initial_c = [0] * (spec.m * spec.n)
     scales, exact_integer = None, None
     if mode == "int8":
+        # 两个动作必须配套：C++ Pass 改接口与元数据，Python 真正量化 A/B 数据。
         sa, sb = quantize.calibrate(av), quantize.calibrate(bv)
         scales = dict(a_scale=sa, b_scale=sb, c_scale=sa * sb)
         lowered = run_tool([opt, f"--npu-quantize-int8=a-scale={sa:.17g} b-scale={sb:.17g}",
@@ -86,15 +96,19 @@ def compile_and_run(a, b, backend_dir, output_dir, *, mode="fp32", tile_size=4,
         input_a, input_b = quantize.quantize_int8(av, sa), quantize.quantize_int8(bv, sb)
     else:
         input_a, input_b = av, bv
+    # 阶段 3：将整矩阵运算展开为 tile，随后为 DRAM/SRAM 分配地址属性。
     tiled = run_tool([opt, f"--npu-tile=tile-size={tile_size}", "--verify-each"], lowered)
     (output_dir / "04-tiled.mlir").write_text(tiled)
     planned = run_tool([opt, f"--npu-plan-memory=sram-bytes={sram_bytes}",
                         "--verify-each"], tiled)
     (output_dir / "05-planned.mlir").write_text(planned)
+    # 阶段 4：Emitter 将规划后的 NPU IR 发射成文本伪指令，不经过 LLVM IR。
     isa = run_tool([translate, "-"], planned)
     (output_dir / "program.npu").write_text(isa)
+    # 阶段 5：把指令和量化/浮点输入一起交给设备功能模型，获取真实模拟结果。
     result = simulator.execute(isa, [input_a, input_b, initial_c])[0]
     if mode == "int8":
+        # 先验证整数计算精确正确，再反量化讨论它与原始浮点计算的误差。
         expected = [sum(input_a[row * spec.k + red] * input_b[red * spec.n + col]
                         for red in range(spec.k))
                     for row in range(spec.m) for col in range(spec.n)]
@@ -107,12 +121,15 @@ def compile_and_run(a, b, backend_dir, output_dir, *, mode="fp32", tile_size=4,
     actual = torch.tensor(values, dtype=torch.float32).reshape(spec.m, spec.n)
     error = (actual - reference).abs()
     if mode == "fp32":
+        # FP32 参考与模拟器的运算顺序/FMA 策略可能不同，因此按容差比较。
         # CPU BLAS may use FMA/reorder additions; Lab5 rounds mul and add separately.
         torch.testing.assert_close(actual, reference, rtol=1e-4, atol=1e-5)
         bound = None
     else:
         # No clipping after max-abs calibration: account for input rounding and
         # measured PyTorch-vs-double accumulation differences at each position.
+        # 利用 |eA|<=sa/2、|eB|<=sb/2 推导每个输出的误差界，
+        # 再计入参考累加精度差异；这不是“任意量化误差都可以接受”。
         double_ref = (a.double() @ b.double()).flatten().tolist()
         ref_values = reference.flatten().tolist()
         bounds = [sum(abs(av[row * spec.k + red]) * sb / 2 +
@@ -124,6 +141,7 @@ def compile_and_run(a, b, backend_dir, output_dir, *, mode="fp32", tile_size=4,
         if any(abs(value - ref) > limit for value, ref, limit in zip(values, ref_values, bounds)):
             raise AssertionError("dequantized result exceeds the per-element rounding bound")
         bound = max(bounds)
+    # 保留阶段 IR、输入/输出和误差报告，使一次失败能够脱离完整模型复现。
     report = dict(mode=mode, shape=dict(m=spec.m, n=spec.n, k=spec.k),
                   torch_version=torch.__version__, tile_size=tile_size, sram_bytes=sram_bytes,
                   max_abs_error=error.max().item(),

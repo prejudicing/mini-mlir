@@ -14,6 +14,7 @@ from quantize import calibrate, quantize_int8, quantize_accumulator, dequantize_
 from simulator import execute, f32
 
 
+# IR 只描述形状和计算；真实浮点数据保留在 Python 中并走独立的数据流。
 def matmul_source(m, n, k):
     a, b, c = f"memref<{m}x{k}xf32>", f"memref<{k}x{n}xf32>", f"memref<{m}x{n}xf32>"
     return (f"module {{ func.func @matmul(%a: {a}, %b: {b}, %c: {c}) {{\n"
@@ -41,6 +42,7 @@ def run_demo(build_dir, output_dir, data=None):
                [f32(x) for x in data.get("c", [0.0] * (m * n))])
     if (len(a), len(b), len(c)) != (m * k, k * n, m * n):
         raise ValueError("flat tensor lengths do not match M/N/K")
+    # 先从真实数据校准；同一份 scale 同时用于数据量化和传给编译器的元数据。
     sa, sb = calibrate(a), calibrate(b)
     qa, qb = quantize_int8(a, sa), quantize_int8(b, sb)
     qc = quantize_accumulator(c, sa, sb)
@@ -53,15 +55,18 @@ def run_demo(build_dir, output_dir, data=None):
 
     build_dir, output_dir = Path(build_dir).resolve(), Path(output_dir).resolve()
     source = matmul_source(m, n, k)
+    # 编译阶段：Linalg -> NPU -> INT8 ABI -> tile -> 内存规划。
     planned = run_tool([str(build_dir / "npu-opt"),
                         f"--npu-compile=quantize-int8=true a-scale={sa:.17g} b-scale={sb:.17g}",
                         "--verify-each"], source)
     program = run_tool([str(build_dir / "npu-translate"), "-"], planned)
+    # 执行阶段：传入量化后的 qa/qb/qc，不能把原始浮点输入冒充整数 buffer。
     actual = execute(program, [qa, qb, qc])[0]
     if actual["values"] != expected:
         raise AssertionError("INT8 execution differs from exact integer reference")
     if actual["quantization"] != dict(a_scale=sa, b_scale=sb, c_scale=sa * sb):
         raise AssertionError("compiler did not preserve calibration scales")
+    # 整数结果正确之后，才反量化并与浮点参考比较量化损失。
     dequantized = dequantize_accumulator(actual["values"], sa, sb)
 
     reference, bounds = [], []
@@ -82,6 +87,7 @@ def run_demo(build_dir, output_dir, data=None):
                   max_abs_error=max(errors), rmse=math.sqrt(sum(x * x for x in errors) / len(errors)),
                   input_bytes_fp32=4 * (len(a) + len(b)), input_bytes_int8=len(a) + len(b),
                   integer_reference_exact=True)
+    # 保存实际输入、编译产物与结果，方便重放和定位失败。
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "input.mlir").write_text(source)
     (output_dir / "planned.mlir").write_text(planned)

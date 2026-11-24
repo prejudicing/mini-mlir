@@ -1,5 +1,7 @@
 # Lab1：Pattern Rewrite 与 Greedy Rewrite
 
+文件结构与职责：[PNG 图](diagrams/file-structure.png) · [可缩放 SVG](diagrams/file-structure.svg)。
+
 零基础学习请先看 [图解教程](TUTORIAL.md)，本文保留实现与运行参考。
 
 目标：实现整数加法 `x + 0 → x`，验证驱动器能连续处理多个 Operation，且保留不匹配的加法。

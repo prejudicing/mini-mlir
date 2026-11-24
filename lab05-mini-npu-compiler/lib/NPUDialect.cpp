@@ -5,11 +5,13 @@
 #include <cmath>
 #include <limits>
 
+// TableGen 生成方言基础实现；GET_OP_CLASSES 选择生成文件中的 Op 类实现部分。
 #include "NPUDialect.cpp.inc"
 #define GET_OP_CLASSES
 #include "NPUOps.cpp.inc"
 
 using namespace mlir;
+// 加载方言时框架调用 initialize；GET_OP_LIST 展开为 MatmulOp、TileOp 类型列表。
 void npu::NPUDialect::initialize() {
   addOperations<
 #define GET_OP_LIST
@@ -17,6 +19,7 @@ void npu::NPUDialect::initialize() {
       >();
 }
 
+// 所有阶段共用的矩阵约束：静态二维、连续行优先、约定的类型和形状。
 LogicalResult npu::verifyMatrices(Operation *op, Value a, Value b, Value c) {
   for (Value value : {a, b, c}) {
     auto type = dyn_cast<MemRefType>(value.getType());
@@ -32,6 +35,7 @@ LogicalResult npu::verifyMatrices(Operation *op, Value a, Value b, Value c) {
   auto bt = cast<MemRefType>(b.getType());
   auto ct = cast<MemRefType>(c.getType());
   bool fp32 = at.getElementType().isF32() && bt.getElementType().isF32() && ct.getElementType().isF32();
+  // MLIR 的 signless i8 本身不指定符号；本项目的运算语义将它解释为有符号数。
   bool int8 = at.getElementType().isSignlessInteger(8) &&
               bt.getElementType().isSignlessInteger(8) && ct.getElementType().isSignlessInteger(32);
   if (!fp32 && !int8)
@@ -39,11 +43,14 @@ LogicalResult npu::verifyMatrices(Operation *op, Value a, Value b, Value c) {
   if (at.getDimSize(1) != bt.getDimSize(0) ||
       at.getDimSize(0) != ct.getDimSize(0) || bt.getDimSize(1) != ct.getDimSize(1))
     return op->emitOpError("requires A[M,K], B[K,N], C[M,N]");
+  // 这里只拒绝同一个 SSA buffer；不能证明不同参数在真实内存中不重叠。
+  // 调用者还必须遵守 A/B/C 独立存储的 ABI。
   if (a == c || b == c)
     return op->emitOpError("output must not alias an input SSA buffer");
   return success();
 }
 
+// 只验证量化元数据的一致性，无法读取 buffer 数据来检查它是否已真正量化。
 LogicalResult npu::verifyQuantization(Operation *function) {
   auto func = dyn_cast<func::FuncOp>(function);
   if (!func) return function->emitError("quantization metadata requires func.func");
@@ -77,6 +84,7 @@ LogicalResult npu::MatmulOp::verify() {
   return verifyMatrices(getOperation(), getA(), getB(), getC());
 }
 
+// tile 同时引用完整矩阵和块的偏移/尺寸；以“剩余大小”检查边界，避免加法溢出。
 LogicalResult npu::TileOp::verify() {
   if (failed(verifyMatrices(getOperation(), getA(), getB(), getC()))) return failure();
   auto at = cast<MemRefType>(getA().getType());

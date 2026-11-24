@@ -14,7 +14,9 @@ int main(int argc, char **argv) {
   mlir::DialectRegistry registry;
   registry.insert<mlir::npu::NPUDialect, mlir::func::FuncDialect>();
   mlir::MLIRContext context(registry);
+  // 输入是规划后的 MLIR；文件名为 - 时从标准输入读取，便于由 run.py 串联。
   auto module = mlir::parseSourceFile<mlir::ModuleOp>(argv[1], &context);
   if (!module) return 1;
+  // 将 NPU IR 发射为伪指令；llvm::outs 只是输出流，不代表经过 LLVM 编译。
   return mlir::failed(mlir::npu::emitInstructions(*module, llvm::outs())) ? 1 : 0;
 }
